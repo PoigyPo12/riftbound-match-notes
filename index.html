@@ -418,11 +418,11 @@
                                         <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
                                         <div class="flex items-center justify-around w-full gap-0.5">
                                             <div class="admin-only flex items-center shrink">
-                                                <button class="btn-stat shrink !min-w-[1.5rem] !max-w-[2.2rem] w-full !h-[2.6rem] !text-lg transition-all" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
+                                                <button class="btn-stat shrink !min-w-[1.7rem] !max-w-[2.4rem] w-full !h-[2.8rem] !text-lg transition-all" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
                                             </div>
                                             <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
                                             <div class="admin-only flex items-center gap-1 shrink">
-                                                <button class="btn-stat shrink !min-w-[1.5rem] !max-w-[2.2rem] w-full !h-[2.6rem] !text-lg transition-all" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
+                                                <button class="btn-stat shrink !min-w-[1.7rem] !max-w-[2.4rem] w-full !h-[2.8rem] !text-lg transition-all" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
                                                 <div class="flex flex-col gap-1 shrink-0">
                                                     <button class="btn-stat !bg-orange-700 hover:!bg-orange-600 !w-[2.6rem] !h-[1.25rem] !text-[9px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
                                                     <button class="btn-stat !bg-blue-700 hover:!bg-blue-600 !w-[2.6rem] !h-[1.25rem] !text-[9px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
@@ -458,7 +458,7 @@
                             state.p1.active = (p === 'p1'); state.p2.active = (p === 'p2');
                             state[p].runes = Math.min(12, (state[p].runes || 0) + 2);
                             state.p1.energy = 0; state.p1.power = 0; state.p2.energy = 0; state.p2.power = 0;
-                            addLog(`[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); sync(); render(); 
+                            addLog(`°°[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); sync(); render(); 
                         }; 
                     }
                 });
@@ -668,7 +668,7 @@
         document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); });
         
         document.getElementById('btn-reset-match').onclick = () => {
-            window.customConfirm("Reset stats and log for a new game?", async () => { 
+            window.customConfirm("Reset stats and logs? Infractions will be kept", async () => { 
                 saveUndo();
                 ['p1', 'p2'].forEach(p => { state[p].points = 0; state[p].xp = 0; state[p].hand = 4; state[p].runes = 0; state[p].energy = 0; state[p].power = 0; state[p].recycled = 0; state[p].active = false; state[p].turnCount = 0; });
                 state.logs = []; state.flag = false; state.flagIssuer = null; state.flaggedStats = {};
@@ -694,7 +694,7 @@
             document.getElementById('modal-confirm').classList.remove('hidden');
         };
 
-        const exportLog = () => { const text = `REPORT - Room: ${currentRoom} - Table: ${state.tableNum}\nJudge: ${state.judgeName}\n\nLOG:\n${state.logs.join('\n')}`; const blob = new Blob([text], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Log_${currentRoom}.txt`; a.click(); };
+        const exportLog = () => { const text = `REPORT - Room: ${currentRoom} - Table: ${state.tableNum}\nJudge: ${state.judgeName}\n\nLOG:\n${state.logs.join('\n')}`; const blob = new Blob([text], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Log_${currentRoom}_${state.judgeName}.txt`; a.click(); };
         document.getElementById('btn-export').onclick = exportLog;
         document.getElementById('btn-leave-room').onclick = () => { window.customConfirm("Leave current room?", () => { location.reload(); }); };
 
