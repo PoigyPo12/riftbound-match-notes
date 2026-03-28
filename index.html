@@ -9,6 +9,11 @@
     
     <title>RB Match Buddy</title>
     
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon/icon-512.png">
+    <link rel="apple-touch-icon" href="/icon/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
@@ -20,6 +25,7 @@
             -webkit-tap-highlight-color: transparent; 
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
         
         .safe-padding {
@@ -32,13 +38,6 @@
         
         .active-turn-p1 { border-color: rgba(20, 184, 166, 0.8); box-shadow: 0 0 20px rgba(20, 184, 166, 0.1) inset; }
         .active-turn-p2 { border-color: rgba(244, 63, 94, 0.8); box-shadow: 0 0 20px rgba(244, 63, 94, 0.1) inset; }
-
-        @keyframes soft-glow {
-            0% { background-color: rgba(255, 255, 255, 0); }
-            50% { background-color: rgba(255, 255, 255, 0.06); }
-            100% { background-color: rgba(255, 255, 255, 0); }
-        }
-        .flash-active-effect { animation: soft-glow 1.5s ease-in-out forwards; }
 
         .stat-card { 
             background-color: rgba(30, 41, 59, 0.8); 
@@ -63,6 +62,8 @@
             color: white; 
             transition: all 0.1s; 
             touch-action: manipulation; 
+            cursor: pointer;
+            border: none;
         }
         .btn-stat:active { background-color: #475569; transform: scale(0.92); }
 
@@ -120,6 +121,13 @@
             transition: all 0.2s;
         }
         .btn-shield:active { transform: scale(0.9); background-color: rgba(51, 65, 85, 0.8); }
+
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #14b8a6; }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body class="safe-padding">
@@ -155,19 +163,19 @@
                 <span id="ui-judge-name" class="text-[9px] text-slate-500 font-medium truncate mt-0.5 uppercase tracking-wide">JUDGE: ---</span>
             </div>
             <div class="flex gap-2 shrink-0">
-                <button id="btn-flag" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition">
+                <button id="btn-flag" title="Judge Call" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>
                 </button>
-                <button id="btn-undo" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center admin-only active:scale-90 transition">
+                <button id="btn-undo" title="Undo" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center admin-only active:scale-90 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
                 </button>
-                <button id="btn-log" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition">
+                <button id="btn-log" title="History" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </button>
-                <button id="btn-settings" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition overflow-hidden">
-                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button id="btn-settings" title="Settings" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition overflow-hidden">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2 2 2 0 0 1-2 2 2 2 0 0 0-2 2 2 2 0 0 1-2 2 2 2 0 0 0-2 2v.44a2 2 0 0 0 2 2 2 2 0 0 1 2 2 2 2 0 0 0 2 2 2 2 0 0 1 2 2 2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2 2 2 0 0 1 2-2 2 2 0 0 0 2-2 2 2 0 0 1 2-2 2 2 0 0 0 2-2v-.44a2 2 0 0 0-2-2 2 2 0 0 1-2-2 2 2 0 0 0-2-2 2 2 0 0 1-2-2 2 2 0 0 0-2-2z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
                 </button>
             </div>
@@ -176,6 +184,14 @@
         <main class="play-area flex-grow" id="play-area"></main>
         
         <footer class="footer-log" id="ui-last-log">Ready</footer>
+    </div>
+
+    <!-- Modal Confirm -->
+    <div id="modal-confirm" class="modal-overlay fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-2xl w-full max-w-xs border border-slate-700 shadow-2xl p-6 flex flex-col items-center text-center">
+            <h3 id="confirm-msg" class="font-bold text-slate-200 text-lg mb-6">Are you sure?</h3>
+            <div class="flex flex-col gap-3 w-full" id="confirm-buttons"></div>
+        </div>
     </div>
 
     <!-- Infractions Modal -->
@@ -189,14 +205,11 @@
             </div>
             
             <div class="overflow-y-auto p-6 space-y-4 flex-1">
-                <!-- History Section -->
                 <div>
                     <label class="text-[10px] uppercase font-bold text-slate-500 block mb-3 tracking-widest">History</label>
                     <div id="inf-list" class="space-y-2"></div>
                 </div>
-
-                <!-- Add New Form -->
-                <div id="inf-form" class="hidden border-t border-slate-700 pt-6 mt-4 animate-in slide-in-from-bottom-4 duration-300">
+                <div id="inf-form" class="hidden border-t border-slate-700 pt-6 mt-4">
                     <div class="space-y-4">
                         <div>
                             <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Type</label>
@@ -221,8 +234,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Gavel Button Footer -->
             <div id="inf-footer" class="p-4 border-t border-slate-700 bg-slate-900/50 admin-only">
                 <button onclick="toggleInfForm(true)" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition">
                     <span>🔨</span> Assign New Penalty
@@ -231,23 +242,43 @@
         </div>
     </div>
 
-    <!-- Other Modals -->
+    <!-- Log Modal -->
     <div id="modal-log" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-lg h-[80vh] flex flex-col border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Match History</h3><button class="close-modal p-2">✕</button></div>
             <div id="log-container" class="p-4 overflow-y-auto flex-1 font-mono text-xs space-y-2"></div>
-            <div class="p-4 border-t border-slate-700"><button id="btn-export" class="w-full bg-slate-700 py-3 rounded-xl font-bold">Copy Report</button></div>
+            <div class="p-4 border-t border-slate-700">
+                <button id="btn-export" class="w-full bg-teal-700 hover:bg-teal-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                    Download Log (.txt)
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Settings Modal -->
     <div id="modal-settings" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Settings</h3><button class="close-modal p-2">✕</button></div>
             <div class="p-6 space-y-6">
-                <div class="flex items-center justify-between"><span class="text-sm">Keep Screen Awake</span><input type="checkbox" id="toggle-wake" class="w-6 h-6 accent-teal-500"></div>
-                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-4 rounded-xl font-bold admin-only">Reset for New Game</button>
-                <div class="border-t border-slate-700 pt-6">
-                    <button id="btn-leave-room" class="w-full bg-slate-700 text-slate-200 py-3 rounded-xl font-bold">Leave Room</button>
+                <div class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+                    <div>
+                        <span class="block font-bold text-slate-200">Wake Lock</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-black">Keep Screen On</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-wakelock">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-4 rounded-xl font-bold admin-only hover:bg-red-800 transition">Reset</button>
+
+                <div class="border-t border-slate-700 pt-6 space-y-3">
+                    <a href="https://poigypo12.github.io/riftbound-auditor/" target="_blank" class="w-full bg-indigo-900/50 border border-indigo-700 hover:bg-indigo-800/80 text-indigo-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2">
+                        <span>📊</span> Open Auditor Tool
+                    </a>
+                    <button id="btn-leave-room" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-3 rounded-xl font-bold transition">Leave Room</button>
                 </div>
             </div>
         </div>
@@ -273,58 +304,45 @@
 
         let userRole = 'viewer'; let currentRoom = null; let undoStack = []; let editingPlayer = null; let activeInfPlayer = null;
         let unsubscribeRoom = null;
+        let wakeLock = null;
         
         const defaultState = { 
             judgeName: "Judge",
-            p1: { name: "Player 1", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, active: false, turnCount: 0, infractions: [] }, 
-            p2: { name: "Player 2", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, active: false, turnCount: 0, infractions: [] }, 
+            p1: { name: "Player 1", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, recycled: 0, active: false, turnCount: 0, infractions: [] }, 
+            p2: { name: "Player 2", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, recycled: 0, active: false, turnCount: 0, infractions: [] }, 
             flag: false, logs: [] 
         };
         let state = JSON.parse(JSON.stringify(defaultState));
         const stats = [
             { id: 'points', label: 'Points' }, { id: 'xp', label: 'XP' }, 
             { id: 'runes', label: '🌀 Runes' }, { id: 'hand', label: '🖐🏻 Hand' }, 
-            { id: 'energy', label: 'Energy' }, { id: 'power', label: 'Power' }
+            { id: 'energy', label: 'Energy' }, { id: 'power', label: 'Power' },
+            { id: 'recycled', label: '♻️ Recycled' }
         ];
 
-        // Beforeunload logic
-        window.addEventListener('beforeunload', (e) => {
-            if (currentRoom && userRole === 'admin') {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
-
-        // TriggerVibrate modified: vibration removed
-        const triggerVibrate = () => {};
+        const triggerVibrate = () => { if (navigator.vibrate) navigator.vibrate(10); };
         
         const sync = async () => { if (userRole !== 'admin' || !currentRoom) return; await setDoc(doc(db, 'matches', currentRoom), state); };
         
         const addLog = (msg) => { 
             const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); 
             state.logs.unshift(`${t} - ${msg}`); 
-            if (state.logs.length > 60) state.logs.pop(); 
-            // Local update of the last log for UI smoothness
+            if (state.logs.length > 500) state.logs.pop(); 
+            updateUI();
+        };
+
+        const updateUI = () => {
             const logEl = document.getElementById('ui-last-log');
-            if(logEl) logEl.innerText = state.logs[0];
+            if(logEl) logEl.innerText = state.logs[0] || "Ready";
         };
         
         const saveUndo = () => { undoStack.push(JSON.stringify(state)); if (undoStack.length > 20) undoStack.shift(); };
-
-        const triggerFlash = (p) => {
-            const el = document.getElementById(`flash-overlay-${p}`);
-            if (!el) return;
-            el.classList.remove('flash-active-effect');
-            void el.offsetWidth;
-            el.classList.add('flash-active-effect');
-        };
 
         const render = () => {
             const container = document.getElementById('play-area');
             if (container.children.length === 0) {
                 container.innerHTML = ['p1', 'p2'].map(p => `
                     <div id="board-${p}" class="player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden">
-                        <div id="flash-overlay-${p}" class="absolute inset-0 pointer-events-none z-0"></div>
                         <div class="flex justify-between items-start mb-4 relative z-10">
                             <div>
                                 <div id="name-container-${p}" class="flex items-center gap-2 mb-1">
@@ -344,39 +362,51 @@
                             <button id="next-${p}" class="admin-only bg-slate-800 px-3 py-1.5 rounded-lg text-[10px] font-black border border-slate-600 active:scale-95 transition uppercase">Next Turn</button>
                         </div>
                         <div class="grid grid-cols-2 gap-3 flex-1 relative z-10">
-                            ${stats.map(s => `
-                                <div class="stat-card">
-                                    <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
-                                    <div class="flex items-center justify-between w-full px-1">
-                                        <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="-1">-</button>
-                                        <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
-                                        <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="1">+</button>
+                            ${stats.map(s => {
+                                if(s.id === 'points') {
+                                    return `
+                                        <div class="stat-card">
+                                            <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
+                                            <div class="flex items-center justify-between w-full px-1">
+                                                <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="-1" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
+                                                <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
+                                                <div class="flex flex-col justify-between h-[2.6rem]">
+                                                    <button class="btn-stat admin-only !bg-orange-700 hover:!bg-orange-600 !w-[2.8rem] !h-[1.2rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
+                                                    <button class="btn-stat admin-only !bg-blue-700 hover:!bg-blue-600 !w-[2.8rem] !h-[1.2rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+                                const spanClass = s.id === 'recycled' ? 'col-span-2' : '';
+                                return `
+                                    <div class="stat-card ${spanClass}">
+                                        <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
+                                        <div class="flex items-center justify-between w-full px-1">
+                                            <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="-1" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
+                                            <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
+                                            <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="1" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
+                                        </div>
                                     </div>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>`).join('');
-                
-                container.addEventListener('click', (e) => {
-                    const btn = e.target.closest('.btn-stat');
-                    if (btn && userRole === 'admin') {
-                        triggerVibrate();
-                        const p = btn.dataset.p; const s = btn.dataset.s; const d = parseInt(btn.dataset.d);
-                        window.doUpdateStat(p, s, d);
-                    }
-                });
 
                 ['p1', 'p2'].forEach(p => { 
-                    document.getElementById(`next-${p}`).onclick = () => { 
-                        if (userRole !== 'admin') return; 
-                        triggerVibrate(); saveUndo(); 
-                        state[p].turnCount++; 
-                        state.p1.active = (p === 'p1'); 
-                        state.p2.active = (p === 'p2');
-                        state[p].runes = Math.min(12, state[p].runes + 2);
-                        state.p1.energy = 0; state.p1.power = 0; state.p2.energy = 0; state.p2.power = 0;
-                        addLog(`[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); triggerFlash(p); sync(); render(); 
-                    }; 
+                    const btnNext = document.getElementById(`next-${p}`);
+                    if(btnNext) {
+                        btnNext.onclick = () => { 
+                            if (userRole !== 'admin') return; 
+                            triggerVibrate(); saveUndo(); 
+                            state[p].turnCount++; 
+                            state.p1.active = (p === 'p1'); 
+                            state.p2.active = (p === 'p2');
+                            state[p].runes = Math.min(12, (state[p].runes || 0) + 2);
+                            state.p1.energy = 0; state.p1.power = 0; state.p2.energy = 0; state.p2.power = 0;
+                            addLog(`[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); sync(); render(); 
+                        }; 
+                    }
                 });
             }
             
@@ -404,12 +434,26 @@
                 }
                 stats.forEach(s => { 
                     const valEl = document.getElementById(`val-${p}-${s.id}`);
-                    if(valEl) valEl.innerText = state[p][s.id]; 
+                    if(valEl) valEl.innerText = state[p][s.id] || 0;
                 });
             });
             document.getElementById('btn-flag').className = `w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition ${state.flag ? 'flag-active' : 'bg-slate-700'}`;
-            if (state.logs[0]) document.getElementById('ui-last-log').innerText = state.logs[0];
+            updateUI();
             document.querySelectorAll('.admin-only').forEach(e => e.style.display = userRole === 'admin' ? '' : 'none');
+        };
+
+        window.doUpdateStat = (p, s, d, reason) => {
+            if (userRole !== 'admin') return;
+            triggerVibrate();
+            saveUndo(); 
+            const oldVal = state[p][s] || 0; 
+            state[p][s] = Math.max(0, oldVal + d); 
+            if (oldVal !== state[p][s]) { 
+                let logStr = `[${state[p].name}] ${stats.find(x=>x.id===s).label.replace('♻️ ', '').replace('🌀 ', '').replace('🖐🏻 ', '')}: ${oldVal} -> ${state[p][s]}`;
+                if (reason && d > 0) logStr += ` (${reason})`;
+                addLog(logStr); 
+            }
+            sync(); render();
         };
 
         window.startEditName = (p) => { if (userRole !== 'admin') return; triggerVibrate(); editingPlayer = p; document.getElementById(`input-name-${p}`).value = state[p].name; render(); };
@@ -420,31 +464,18 @@
             editingPlayer = null; render(); 
         };
 
-        window.doUpdateStat = (p, s, d) => {
-            saveUndo(); const oldVal = state[p][s]; state[p][s] = Math.max(0, state[p][s] + d); 
-            if (oldVal !== state[p][s]) { addLog(`[${state[p].name}] ${stats.find(x=>x.id===s).label}: ${oldVal} -> ${state[p][s]}`); }
-            sync(); render();
-        };
-
         window.toggleInfForm = (show) => {
             triggerVibrate();
             const form = document.getElementById('inf-form');
             const footer = document.getElementById('inf-footer');
-            if(show) {
-                form.classList.remove('hidden');
-                footer.classList.add('hidden');
-            } else {
-                form.classList.add('hidden');
-                footer.classList.remove('hidden');
-            }
+            if(show) { form.classList.remove('hidden'); footer.classList.add('hidden'); } 
+            else { form.classList.add('hidden'); footer.classList.remove('hidden'); }
         };
 
         window.openInfractions = (p) => {
-            triggerVibrate();
-            activeInfPlayer = p;
+            triggerVibrate(); activeInfPlayer = p;
             document.getElementById('inf-player-name').innerText = state[p].name;
-            toggleInfForm(false);
-            updateInfList();
+            toggleInfForm(false); updateInfList();
             document.getElementById('modal-infractions').classList.remove('hidden');
         };
 
@@ -453,29 +484,19 @@
             const p = activeInfPlayer;
             if (!state[p].infractions) state[p].infractions = [];
             list.innerHTML = state[p].infractions.length 
-                ? state[p].infractions.map(inf => `
-                    <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-700/50 flex flex-col gap-1">
-                        <div class="text-[11px] font-bold text-slate-200 uppercase tracking-tight">${inf}</div>
-                    </div>`).join('')
-                : `<div class="text-xs text-slate-500 italic text-center py-8">No infractions recorded for this room.</div>`;
+                ? state[p].infractions.map(inf => `<div class="bg-slate-900/40 p-3 rounded-lg border border-slate-700/50 text-[11px] font-bold text-slate-200 uppercase tracking-tight">${inf}</div>`).join('')
+                : `<div class="text-xs text-slate-500 italic text-center py-8">No infractions recorded.</div>`;
         }
 
         document.getElementById('btn-add-infraction').onclick = () => {
             if (userRole !== 'admin') return;
             triggerVibrate();
-            const type = document.getElementById('inf-type').value;
-            const penalty = document.getElementById('inf-penalty').value;
-            const entry = `${type} - ${penalty}`;
-            
+            const entry = `${document.getElementById('inf-type').value} - ${document.getElementById('inf-penalty').value}`;
             saveUndo();
             if (!state[activeInfPlayer].infractions) state[activeInfPlayer].infractions = [];
             state[activeInfPlayer].infractions.push(entry);
-            addLog(`[${state[activeInfPlayer].name}] ${entry}`);
-            
-            sync();
-            updateInfList();
-            toggleInfForm(false);
-            render();
+            addLog(`[${state[activeInfPlayer].name}] Penalty: ${entry}`);
+            sync(); updateInfList(); toggleInfForm(false); render();
         };
 
         onAuthStateChanged(auth, async u => { if (!u) await signInAnonymously(auth); });
@@ -502,67 +523,132 @@
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('ui-room-code').innerText = currentRoom;
             if (unsubscribeRoom) unsubscribeRoom();
-            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
-                if (s.exists()) { 
-                    state = s.data(); 
-                    render(); 
-                } 
-            });
+            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { if (s.exists()) { state = s.data(); render(); } });
             render();
         }
 
-        document.getElementById('btn-flag').onclick = () => { triggerVibrate(); if (userRole !== 'admin') return; saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ SOLVED"); sync(); render(); };
+        window.customConfirm = (msg, onYes, onNo, options = {}) => {
+            triggerVibrate();
+            document.getElementById('confirm-msg').innerText = msg;
+            const container = document.getElementById('confirm-buttons');
+            container.innerHTML = '';
+            
+            if (options.downloadFirst) {
+                const btnDl = document.createElement('button');
+                btnDl.className = "w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition mb-2";
+                btnDl.innerText = "Download Log & Reset";
+                btnDl.onclick = () => { triggerVibrate(); exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
+                container.appendChild(btnDl);
+                
+                const btnOnlyReset = document.createElement('button');
+                btnOnlyReset.className = "w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition";
+                btnOnlyReset.innerText = "Just Reset (no download)";
+                btnOnlyReset.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
+                container.appendChild(btnOnlyReset);
+                
+                const btnCancel = document.createElement('button');
+                btnCancel.className = "w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition mt-2";
+                btnCancel.innerText = "Cancel";
+                btnCancel.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onNo) onNo(); };
+                container.appendChild(btnCancel);
+            } else {
+                const flex = document.createElement('div');
+                flex.className = "flex gap-3 w-full";
+                
+                const btnNo = document.createElement('button');
+                btnNo.className = "flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition";
+                btnNo.innerText = "No";
+                btnNo.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onNo) onNo(); };
+                
+                const btnYes = document.createElement('button');
+                btnYes.className = "flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition";
+                btnYes.innerText = "Yes";
+                btnYes.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
+                
+                flex.appendChild(btnNo); flex.appendChild(btnYes);
+                container.appendChild(flex);
+            }
+            
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        };
+
+        const exportLog = () => {
+            triggerVibrate();
+            const textContent = `MATCH REPORT - Room: ${currentRoom}\nJudge: ${state.judgeName}\n\nPlayers:\n- ${state.p1.name}\n- ${state.p2.name}\n\nLOG HISTORY:\n${state.logs.join('\n')}`;
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `RB_MatchLog_${currentRoom}_${state.judgeName}.txt`;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        };
+
+        document.getElementById('btn-flag').onclick = () => { if (userRole !== 'admin') return; triggerVibrate(); saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ SOLVED"); sync(); render(); };
         document.getElementById('btn-undo').onclick = () => { triggerVibrate(); if (undoStack.length > 0) { state = JSON.parse(undoStack.pop()); sync(); render(); } };
         document.getElementById('btn-log').onclick = () => { triggerVibrate(); document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); document.getElementById('modal-log').classList.remove('hidden'); };
         document.getElementById('btn-settings').onclick = () => { triggerVibrate(); document.getElementById('modal-settings').classList.remove('hidden'); };
         document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { triggerVibrate(); e.target.closest('.modal-overlay').classList.add('hidden'); });
+
+        document.getElementById('btn-export').onclick = exportLog;
         
-        const exportLogs = () => {
-            const blob = new Blob([state.logs.join('\n')], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `MatchLog_${state.judgeName}_Room${currentRoom}_${new Date().getTime()}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+        document.getElementById('btn-reset-match').onclick = () => {
+            window.customConfirm(
+                "Reset stats and log for a new game?", 
+                async () => { 
+                    saveUndo();
+                    ['p1', 'p2'].forEach(p => {
+                        state[p].points = 0; state[p].xp = 0; state[p].hand = 4; state[p].runes = 0;
+                        state[p].energy = 0; state[p].power = 0; state[p].recycled = 0; state[p].active = false; state[p].turnCount = 0;
+                        // Infractions are NOT cleared
+                    });
+                    state.logs = []; // Clear log history
+                    state.flag = false;
+                    await sync(); render();
+                },
+                null,
+                { downloadFirst: true }
+            );
         };
 
-        document.getElementById('btn-export').onclick = () => { triggerVibrate(); exportLogs(); };
-        
-        document.getElementById('btn-reset-match').onclick = async () => { 
-            triggerVibrate(); 
-            if (confirm("Download current Game Logs before resetting stats?")) {
-                exportLogs();
-            }
-
-            if (confirm("Reset all game stats? (Infractions will be KEPT)")) { 
-                saveUndo();
-                const resetData = (p) => {
-                    p.points = 0; p.xp = 0; p.hand = 4; p.runes = 0;
-                    p.energy = 0; p.power = 0; p.active = false; p.turnCount = 0;
-                };
-                resetData(state.p1); resetData(state.p2);
-                addLog("Game Reset"); await sync(); 
-                document.getElementById('modal-settings').classList.add('hidden');
-                render();
-            } 
-        };
-
-        // Leave Room implementation
         document.getElementById('btn-leave-room').onclick = () => {
-            if (confirm("Are you sure you want to leave this room?")) {
-                if (unsubscribeRoom) unsubscribeRoom();
-                currentRoom = null;
-                state = JSON.parse(JSON.stringify(defaultState));
-                undoStack = [];
-                document.getElementById('play-area').innerHTML = ''; // Force full re-render on re-entry
-                document.getElementById('app-screen').classList.add('hidden');
-                document.getElementById('setup-screen').classList.remove('hidden');
-                document.getElementById('modal-settings').classList.add('hidden');
+            window.customConfirm("Leave current room?", () => { location.reload(); });
+        };
+
+        const toggleWakeLock = async (enabled) => {
+            if (enabled) {
+                try {
+                    if ('wakeLock' in navigator) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    }
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
+                }
+            } else {
+                if (wakeLock) {
+                    await wakeLock.release();
+                    wakeLock = null;
+                }
             }
         };
+
+        document.getElementById('toggle-wakelock').onchange = (e) => {
+            triggerVibrate();
+            toggleWakeLock(e.target.checked);
+        };
+
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                wakeLock = await navigator.wakeLock.request('screen');
+            }
+        });
+
+        // Prevention for accidental closure
+        window.addEventListener('beforeunload', (e) => {
+            if (currentRoom) {
+                e.preventDefault();
+                e.returnValue = 'Are you sure you want to leave? Match data might be lost.';
+            }
+        });
     </script>
 </body>
 </html>
