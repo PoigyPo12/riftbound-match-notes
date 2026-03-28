@@ -63,6 +63,7 @@ To prevent accidental data loss, the tool implements a **History API interceptor
 ## 5. Technical Notes & License
 
 * **Undo Engine**: A 30-step deep undo stack allows the Judge to revert any accidental input instantly.
+   * The Undo engine also reverts global flags and ownership markers. *If a Viewer triggers an accidental Judge Call*, the Admin can use Undo to revert the match to a "Pre-Call" state, effectively erasing the accidental alert and its corresponding log entry.*
 * **Wake Lock**: Integrated to prevent mobile screens from dimming during long 40+ minute rounds.
 * **License**: **Free to Use**. Provided as a community resource for the Riftbound ecosystem. You are free to host, use, and modify this tool for any local or major competitive event.
 
