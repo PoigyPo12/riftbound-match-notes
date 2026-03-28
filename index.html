@@ -377,7 +377,7 @@
             render();
         }
 
-        document.getElementById('btn-flag').onclick = () => { triggerVibrate(); if (userRole !== 'admin') return; saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ RESOLVED"); sync(); render(); };
+        document.getElementById('btn-flag').onclick = () => { triggerVibrate(); if (userRole !== 'admin') return; saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ SOLVED"); sync(); render(); };
         document.getElementById('btn-undo').onclick = () => { triggerVibrate(); if (undoStack.length > 0) { state = JSON.parse(undoStack.pop()); sync(); render(); } };
         document.getElementById('btn-log').onclick = () => { triggerVibrate(); document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); document.getElementById('modal-log').classList.remove('hidden'); };
         document.getElementById('btn-settings').onclick = () => { triggerVibrate(); document.getElementById('modal-settings').classList.remove('hidden'); };
