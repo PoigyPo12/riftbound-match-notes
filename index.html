@@ -211,25 +211,39 @@
                 </div>
                 <div id="inf-form" class="hidden border-t border-slate-700 pt-6 mt-4">
                     <div class="space-y-4">
+                        <!-- Step 1: Infraction Type -->
                         <div>
                             <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Type</label>
                             <select id="inf-type" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-                                <option value="Gameplay Error">Gameplay Error</option>
-                                <option value="Tournament Error">Tournament Error</option>
-                                <option value="Unsporting Conduct">Unsporting Conduct</option>
+                                <option value="" disabled selected>Select Type</option>
+                                <option value="GPE">GPE</option>
+                                <option value="TE">TE</option>
+                                <option value="US">US</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Penalty Assigned</label>
+                        <!-- Step 2: Infraction Subtype -->
+                        <div id="inf-subtype-container" class="hidden">
+                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Subtype</label>
+                            <select id="inf-subtype" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                                <option value="" disabled selected>Select Subtype</option>
+                            </select>
+                        </div>
+                        <!-- Step 3: Penalty -->
+                        <div id="inf-penalty-container" class="hidden">
+                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Penalty</label>
                             <select id="inf-penalty" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                                <option value="" disabled selected>Select Penalty</option>
+                                <option value="No Penalty">No Penalty</option>
                                 <option value="Warning">Warning</option>
                                 <option value="Game Loss">Game Loss</option>
                                 <option value="Match Loss">Match Loss</option>
+                                <option value="DQ">DQ</option>
                             </select>
                         </div>
+
                         <div class="flex gap-2">
                             <button onclick="toggleInfForm(false)" class="flex-1 bg-slate-700 text-white font-bold py-3 rounded-xl">Cancel</button>
-                            <button id="btn-add-infraction" class="flex-[2] bg-red-600 text-white font-bold py-3 rounded-xl">Confirm</button>
+                            <button id="btn-add-infraction" disabled class="flex-[2] bg-red-600 disabled:bg-slate-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl">Assign Penalty</button>
                         </div>
                     </div>
                 </div>
@@ -247,10 +261,14 @@
         <div class="bg-slate-800 rounded-2xl w-full max-w-lg h-[80vh] flex flex-col border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Match History</h3><button class="close-modal p-2">✕</button></div>
             <div id="log-container" class="p-4 overflow-y-auto flex-1 font-mono text-xs space-y-2"></div>
-            <div class="p-4 border-t border-slate-700">
-                <button id="btn-export" class="w-full bg-teal-700 hover:bg-teal-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                    Download Log (.txt)
+            <div class="p-4 border-t border-slate-700 grid grid-cols-2 gap-2">
+                <button id="btn-copy-log" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    Copy
+                </button>
+                <button id="btn-export" class="bg-teal-700 hover:bg-teal-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Download
                 </button>
             </div>
         </div>
@@ -272,13 +290,13 @@
                     </label>
                 </div>
 
-                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-4 rounded-xl font-bold admin-only hover:bg-red-800 transition">Reset</button>
+                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-4 rounded-xl font-bold admin-only hover:bg-red-800 transition uppercase tracking-widest text-xs">Reset</button>
 
                 <div class="border-t border-slate-700 pt-6 space-y-3">
-                    <a href="https://poigypo12.github.io/riftbound-auditor/" target="_blank" class="w-full bg-indigo-900/50 border border-indigo-700 hover:bg-indigo-800/80 text-indigo-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2">
-                        <span>📊</span> Open Auditor Tool
+                    <a href="https://poigypo12.github.io/riftbound-auditor/" target="_blank" class="w-full bg-indigo-900/50 border border-indigo-700 hover:bg-indigo-800/80 text-indigo-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2 text-sm uppercase">
+                        <span>📊</span> Auditor Tool
                     </a>
-                    <button id="btn-leave-room" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-3 rounded-xl font-bold transition">Leave Room</button>
+                    <button id="btn-leave-room" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-3 rounded-xl font-bold transition text-sm uppercase">Leave Room</button>
                 </div>
             </div>
         </div>
@@ -305,6 +323,24 @@
         let userRole = 'viewer'; let currentRoom = null; let undoStack = []; let editingPlayer = null; let activeInfPlayer = null;
         let unsubscribeRoom = null;
         let wakeLock = null;
+
+        const infractionData = {
+            "GPE": [
+                "Missed Trigger", "Forgetting to score a point", "Forgetting to draw cards", 
+                "Looking at extra cards", "Channeling too many runes", "Channeling too few runes", 
+                "Overpayment for cost", "Mispayment for cost", "Looking at secret information", 
+                "Looking at opponent private information", "Drawing extra cards", 
+                "Nonpublic card error", "Mulligan procedure", "General error", "Failure to maintain game state"
+            ],
+            "TE": [
+                "Slowplay", "Decklist error", "Deck presentation error", "Communication violation", 
+                "Marked cards", "Insufficient randomization", "Late to match", "Outside assistance", 
+                "Improperly determining a winner"
+            ],
+            "US": [
+                "Unsporting minor", "Unsporting major", "Angle shooting", "Bribery", "Wagering", "Theft", "Cheating"
+            ]
+        };
         
         const defaultState = { 
             judgeName: "Judge",
@@ -449,7 +485,7 @@
             const oldVal = state[p][s] || 0; 
             state[p][s] = Math.max(0, oldVal + d); 
             if (oldVal !== state[p][s]) { 
-                let logStr = `[${state[p].name}] ${stats.find(x=>x.id===s).label.replace('♻️ ', '').replace('🌀 ', '').replace('🖐🏻 ', '')}: ${oldVal} -> ${state[p][s]}`;
+                let logStr = `[${state[p].name}] ${stats.find(x=>x.id===s).label.replace('🌀 ', '').replace('🖐🏻 ', '').replace('♻️ ', '')}: ${oldVal} -> ${state[p][s]}`;
                 if (reason && d > 0) logStr += ` (${reason})`;
                 addLog(logStr); 
             }
@@ -464,12 +500,54 @@
             editingPlayer = null; render(); 
         };
 
+        const resetInfForm = () => {
+            document.getElementById('inf-type').value = "";
+            document.getElementById('inf-subtype').value = "";
+            document.getElementById('inf-penalty').value = "";
+            document.getElementById('inf-subtype-container').classList.add('hidden');
+            document.getElementById('inf-penalty-container').classList.add('hidden');
+            document.getElementById('btn-add-infraction').disabled = true;
+        };
+
         window.toggleInfForm = (show) => {
             triggerVibrate();
             const form = document.getElementById('inf-form');
             const footer = document.getElementById('inf-footer');
-            if(show) { form.classList.remove('hidden'); footer.classList.add('hidden'); } 
-            else { form.classList.add('hidden'); footer.classList.remove('hidden'); }
+            if(show) { 
+                resetInfForm();
+                form.classList.remove('hidden'); 
+                footer.classList.add('hidden'); 
+            } 
+            else { 
+                form.classList.add('hidden'); 
+                footer.classList.remove('hidden'); 
+            }
+        };
+
+        document.getElementById('inf-type').onchange = (e) => {
+            const type = e.target.value;
+            const subtypeSelect = document.getElementById('inf-subtype');
+            subtypeSelect.innerHTML = '<option value="" disabled selected>Select Subtype</option>';
+            
+            if (infractionData[type]) {
+                infractionData[type].forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s; opt.innerText = s;
+                    subtypeSelect.appendChild(opt);
+                });
+                document.getElementById('inf-subtype-container').classList.remove('hidden');
+            }
+            document.getElementById('inf-penalty-container').classList.add('hidden');
+            document.getElementById('btn-add-infraction').disabled = true;
+        };
+
+        document.getElementById('inf-subtype').onchange = () => {
+            document.getElementById('inf-penalty-container').classList.remove('hidden');
+            document.getElementById('btn-add-infraction').disabled = true;
+        };
+
+        document.getElementById('inf-penalty').onchange = () => {
+            document.getElementById('btn-add-infraction').disabled = false;
         };
 
         window.openInfractions = (p) => {
@@ -484,14 +562,18 @@
             const p = activeInfPlayer;
             if (!state[p].infractions) state[p].infractions = [];
             list.innerHTML = state[p].infractions.length 
-                ? state[p].infractions.map(inf => `<div class="bg-slate-900/40 p-3 rounded-lg border border-slate-700/50 text-[11px] font-bold text-slate-200 uppercase tracking-tight">${inf}</div>`).join('')
+                ? state[p].infractions.map(inf => `<div class="bg-slate-900/40 p-3 rounded-lg border border-slate-700/50 text-[11px] font-bold text-slate-200 uppercase tracking-tight leading-relaxed">${inf}</div>`).join('')
                 : `<div class="text-xs text-slate-500 italic text-center py-8">No infractions recorded.</div>`;
         }
 
         document.getElementById('btn-add-infraction').onclick = () => {
             if (userRole !== 'admin') return;
             triggerVibrate();
-            const entry = `${document.getElementById('inf-type').value} - ${document.getElementById('inf-penalty').value}`;
+            const type = document.getElementById('inf-type').value;
+            const subtype = document.getElementById('inf-subtype').value;
+            const penalty = document.getElementById('inf-penalty').value;
+            const entry = `${type}: ${subtype} | ${penalty}`;
+            
             saveUndo();
             if (!state[activeInfPlayer].infractions) state[activeInfPlayer].infractions = [];
             state[activeInfPlayer].infractions.push(entry);
@@ -523,7 +605,7 @@
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('ui-room-code').innerText = currentRoom;
             if (unsubscribeRoom) unsubscribeRoom();
-            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { if (s.exists()) { state = s.data(); render(); } });
+            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { if (s.exists()) { state = s.data(); render(); } }, (err) => console.error(err));
             render();
         }
 
@@ -535,19 +617,19 @@
             
             if (options.downloadFirst) {
                 const btnDl = document.createElement('button');
-                btnDl.className = "w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition mb-2";
-                btnDl.innerText = "Download Log & Reset";
+                btnDl.className = "w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition mb-2 text-xs uppercase tracking-wider";
+                btnDl.innerText = "Download & Reset";
                 btnDl.onclick = () => { triggerVibrate(); exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
                 container.appendChild(btnDl);
                 
                 const btnOnlyReset = document.createElement('button');
-                btnOnlyReset.className = "w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition";
-                btnOnlyReset.innerText = "Just Reset (no download)";
+                btnOnlyReset.className = "w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider";
+                btnOnlyReset.innerText = "Just Reset";
                 btnOnlyReset.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
                 container.appendChild(btnOnlyReset);
                 
                 const btnCancel = document.createElement('button');
-                btnCancel.className = "w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition mt-2";
+                btnCancel.className = "w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition mt-2 text-xs uppercase tracking-wider";
                 btnCancel.innerText = "Cancel";
                 btnCancel.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onNo) onNo(); };
                 container.appendChild(btnCancel);
@@ -572,15 +654,38 @@
             document.getElementById('modal-confirm').classList.remove('hidden');
         };
 
+        const generateLogString = () => {
+            return `MATCH REPORT - Room: ${currentRoom}\nJudge: ${state.judgeName}\n\nPlayers:\n- ${state.p1.name}\n- ${state.p2.name}\n\nLOG HISTORY:\n${state.logs.join('\n')}`;
+        };
+
         const exportLog = () => {
             triggerVibrate();
-            const textContent = `MATCH REPORT - Room: ${currentRoom}\nJudge: ${state.judgeName}\n\nPlayers:\n- ${state.p1.name}\n- ${state.p2.name}\n\nLOG HISTORY:\n${state.logs.join('\n')}`;
+            const textContent = generateLogString();
             const blob = new Blob([textContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `RB_MatchLog_${currentRoom}_${state.judgeName}.txt`;
+            a.href = url; a.download = `RB_MatchLog_${currentRoom}.txt`;
             document.body.appendChild(a); a.click();
             document.body.removeChild(a); URL.revokeObjectURL(url);
+        };
+
+        document.getElementById('btn-copy-log').onclick = () => {
+            triggerVibrate();
+            const text = generateLogString();
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                const btn = document.getElementById('btn-copy-log');
+                const originalText = btn.innerHTML;
+                btn.innerText = "Copied!";
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+            document.body.removeChild(textarea);
         };
 
         document.getElementById('btn-flag').onclick = () => { if (userRole !== 'admin') return; triggerVibrate(); saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ SOLVED"); sync(); render(); };
@@ -599,9 +704,8 @@
                     ['p1', 'p2'].forEach(p => {
                         state[p].points = 0; state[p].xp = 0; state[p].hand = 4; state[p].runes = 0;
                         state[p].energy = 0; state[p].power = 0; state[p].recycled = 0; state[p].active = false; state[p].turnCount = 0;
-                        // Infractions are NOT cleared
                     });
-                    state.logs = []; // Clear log history
+                    state.logs = [];
                     state.flag = false;
                     await sync(); render();
                 },
@@ -642,11 +746,10 @@
             }
         });
 
-        // Prevention for accidental closure
         window.addEventListener('beforeunload', (e) => {
             if (currentRoom) {
                 e.preventDefault();
-                e.returnValue = 'Are you sure you want to leave? Match data might be lost.';
+                e.returnValue = 'Data will be lost.';
             }
         });
     </script>
