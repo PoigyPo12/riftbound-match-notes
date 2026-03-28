@@ -211,11 +211,11 @@
     <div id="app-screen" class="hidden min-h-screen flex flex-col relative">
         <header class="h-16 bg-slate-800/80 sticky top-0 z-40 border-b border-slate-700 flex justify-between items-center px-4 shrink-0 backdrop-blur-sm gap-2">
             <div class="flex flex-col min-w-0 flex-1 justify-center">
-                <div class="flex items-center gap-1.5">
-                    <span class="text-[8px] uppercase text-slate-400 font-bold tracking-wider">Room</span>
-                    <span id="ui-room-code" class="text-base font-mono font-black text-teal-300 tracking-wider bg-teal-900/40 px-1.5 py-0.5 rounded border border-teal-700/50">----</span>
-                    <span class="text-[8px] uppercase text-slate-400 font-bold tracking-wider ml-0.5">Tbl</span>
-                    <span id="ui-table-num" class="text-base font-mono font-black text-amber-400 tracking-wider bg-amber-900/40 px-1.5 py-0.5 rounded border border-amber-700/50">0</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[9px] uppercase text-slate-400 font-bold tracking-wider">Room</span>
+                    <span id="ui-room-code" class="text-lg font-mono font-black text-teal-300 tracking-wider bg-teal-900/40 px-2 py-0.5 rounded border border-teal-700/50">----</span>
+                    <span class="text-[9px] uppercase text-slate-400 font-bold tracking-wider ml-1">Tbl</span>
+                    <span id="ui-table-num" class="text-lg font-mono font-black text-amber-400 tracking-wider bg-amber-900/40 px-2 py-0.5 rounded border border-amber-700/50">0</span>
                 </div>
                 <span id="ui-judge-name" class="text-[9px] text-slate-500 font-medium truncate mt-0.5 uppercase tracking-wide">JUDGE: ---</span>
             </div>
@@ -413,31 +413,20 @@
                         <div class="grid grid-cols-2 gap-3 flex-1 relative z-10">
                             ${stats.map(s => {
                                 const key = `${p}-${s.id}`;
-                                if (s.id === 'points') {
-                                    return `<div id="card-${key}" class="stat-card" onclick="window.toggleStatFlag('${key}')">
-                                        <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
-                                        <div class="flex items-center justify-between w-full px-1">
-                                            <div class="flex items-center justify-around w-full gap-1">
-                                        <div class="admin-only flex items-center">
-                                            <button class="btn-stat !w-[2.2rem] !h-[2.6rem] !text-lg" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
-                                        </div>
-                                        <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
-                                        <div class="admin-only flex items-center gap-1">
-                                            <button class="btn-stat !w-[2.2rem] !h-[2.6rem] !text-lg" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
-                                            <div class="flex flex-col gap-1">
-                                                <button class="btn-stat !bg-orange-700 hover:!bg-orange-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
-                                                <button class="btn-stat !bg-blue-700 hover:!bg-blue-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    </div>`;
-                                }
                                 return `<div id="card-${key}" class="stat-card ${s.id === 'recycled' ? 'col-span-2' : ''}" onclick="window.toggleStatFlag('${key}')">
                                     <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
                                     <div class="flex items-center justify-between w-full px-1">
                                         <button class="btn-stat admin-only" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
                                         <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
-                                        <button class="btn-stat admin-only" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
+                                        ${s.id === 'points' ? `
+                                            <div class="flex items-center gap-1">
+                                                <button class="btn-stat admin-only !w-[2rem] !h-[2.6rem] !text-lg" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
+                                                <div class="flex flex-col gap-1">
+                                                    <button class="btn-stat admin-only !bg-orange-700 hover:!bg-orange-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
+                                                    <button class="btn-stat admin-only !bg-blue-700 hover:!bg-blue-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
+                                                </div>
+                                            </div>
+                                        ` : `<button class="btn-stat admin-only" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>`}
                                     </div>
                                 </div>`;
                             }).join('')}
@@ -459,7 +448,7 @@
                             state.p1.active = (p === 'p1'); state.p2.active = (p === 'p2');
                             state[p].runes = Math.min(12, (state[p].runes || 0) + 2);
                             state.p1.energy = 0; state.p1.power = 0; state.p2.energy = 0; state.p2.power = 0;
-                            addLog(`[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); sync(); render(); 
+                            addLog(`°°[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); sync(); render(); 
                         }; 
                     }
                 });
@@ -548,7 +537,7 @@
                 const mins = parseInt(input);
                 if (!isNaN(mins) && mins >= 0) {
                     saveUndo();
-                    state.timerActive = false;
+                    state.timerActive = false; // Stop timer on set
                     state.timerSeconds = mins * 60;
                     sync(); render();
                 }
@@ -649,14 +638,16 @@
                 await navigator.clipboard.writeText(logString);
                 btnText.innerText = "COPIED!";
                 setTimeout(() => { btnText.innerText = "Copy"; }, 1000);
-            } catch (err) { console.error('Failed to copy!', err); }
+            } catch (err) {
+                console.error('Failed to copy!', err);
+            }
         };
 
         document.getElementById('btn-settings').onclick = () => { document.getElementById('modal-settings').classList.remove('hidden'); };
         document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); });
         
         document.getElementById('btn-reset-match').onclick = () => {
-            window.customConfirm("Reset stats and log for a new game?", async () => { 
+            window.customConfirm("Reset stats and log? Infractions will be kept", async () => { 
                 saveUndo();
                 ['p1', 'p2'].forEach(p => { state[p].points = 0; state[p].xp = 0; state[p].hand = 4; state[p].runes = 0; state[p].energy = 0; state[p].power = 0; state[p].recycled = 0; state[p].active = false; state[p].turnCount = 0; });
                 state.logs = []; state.flag = false; state.flagIssuer = null; state.flaggedStats = {};
@@ -671,7 +662,7 @@
             const container = document.getElementById('confirm-buttons');
             container.innerHTML = '';
             if (options.downloadFirst) {
-                const b1 = document.createElement('button'); b1.className = "w-full bg-teal-600 p-3 rounded-xl font-bold uppercase text-xs"; b1.innerText = "Download log and exit"; b1.onclick = () => { exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b1);
+                const b1 = document.createElement('button'); b1.className = "w-full bg-teal-600 p-3 rounded-xl font-bold uppercase text-xs"; b1.innerText = "Download Logs and reset"; b1.onclick = () => { exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b1);
                 const b2 = document.createElement('button'); b2.className = "w-full bg-red-600 p-3 rounded-xl font-bold uppercase text-xs"; b2.innerText = "Just reset"; b2.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b2);
                 const b3 = document.createElement('button'); b3.className = "w-full bg-slate-700 p-3 rounded-xl font-bold uppercase text-xs"; b3.innerText = "Cancel"; b3.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); if(onNo) onNo(); }; container.appendChild(b3);
             } else {
@@ -682,14 +673,16 @@
             document.getElementById('modal-confirm').classList.remove('hidden');
         };
 
-        const exportLog = () => { const text = `REPORT - Room: ${currentRoom} - Table: ${state.tableNum}\nJudge: ${state.judgeName}\n\nLOG:\n${state.logs.join('\n')}`; const blob = new Blob([text], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Log_${currentRoom}.txt`; a.click(); };
+        const exportLog = () => { const text = `REPORT - Room: ${currentRoom} - Table: ${state.tableNum}\nJudge: ${state.judgeName}\n\nLOG:\n${state.logs.join('\n')}`; const blob = new Blob([text], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Log_${currentRoom}.txt_${state.judgeName}`; a.click(); };
         document.getElementById('btn-export').onclick = exportLog;
         document.getElementById('btn-leave-room').onclick = () => { window.customConfirm("Leave current room?", () => { location.reload(); }); };
 
         const toggleWakeLock = async (enabled) => { if (enabled && 'wakeLock' in navigator) try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} else if (wakeLock) { await wakeLock.release(); wakeLock = null; } };
         document.getElementById('toggle-wakelock').onchange = (e) => { triggerVibrate(); toggleWakeLock(e.target.checked); };
         
-        document.addEventListener('visibilitychange', async () => { if (wakeLock !== null && document.visibilityState === 'visible') wakeLock = await navigator.wakeLock.request('screen'); });
+        document.addEventListener('visibilitychange', async () => { 
+            if (wakeLock !== null && document.visibilityState === 'visible') wakeLock = await navigator.wakeLock.request('screen'); 
+        });
 
         window.onbeforeunload = (e) => {
             if (currentRoom) {
