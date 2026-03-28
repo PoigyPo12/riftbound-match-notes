@@ -216,7 +216,14 @@
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // CONFIGURAZIONE FIREBASE - Inserisci qui i tuoi dati reali
-        const firebaseConfig = JSON.parse(__firebase_config);
+        const firebaseConfig = const firebaseConfig = {
+  apiKey: "AIzaSyAoSrB369YkJRGvN5ppvfMrWPyc4A_TQp8",
+  authDomain: "riftbound-match-notes.firebaseapp.com",
+  projectId: "riftbound-match-notes",
+  storageBucket: "riftbound-match-notes.firebasestorage.app",
+  messagingSenderId: "572843702141",
+  appId: "1:572843702141:web:7e82385fc04c6678aebe14"
+};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'tcg-assistant';
 
         const app = initializeApp(firebaseConfig);
