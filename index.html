@@ -503,7 +503,7 @@
                 exportLogs();
             }
 
-            if (confirm("Are you sure? This will reset all game stats (Infractions will be KEPT).")) { 
+            if (confirm("Reset all game stats? (Infractions will be KEPT)")) { 
                 saveUndo();
                 const resetData = (p) => {
                     p.points = 0; p.xp = 0; p.hand = 4; p.runes = 0;
