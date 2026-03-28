@@ -244,9 +244,11 @@
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Settings</h3><button class="close-modal p-2">✕</button></div>
             <div class="p-6 space-y-6">
-                <div class="flex items-center justify-between"><span class="text-sm">Haptic Feedback</span><input type="checkbox" id="toggle-haptic" class="w-6 h-6 accent-teal-500" checked></div>
                 <div class="flex items-center justify-between"><span class="text-sm">Keep Screen Awake</span><input type="checkbox" id="toggle-wake" class="w-6 h-6 accent-teal-500"></div>
                 <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-4 rounded-xl font-bold admin-only">Reset for New Game</button>
+                <div class="border-t border-slate-700 pt-6">
+                    <button id="btn-leave-room" class="w-full bg-slate-700 text-slate-200 py-3 rounded-xl font-bold">Leave Room</button>
+                </div>
             </div>
         </div>
     </div>
@@ -270,6 +272,7 @@
         const db = getFirestore(app);
 
         let userRole = 'viewer'; let currentRoom = null; let undoStack = []; let editingPlayer = null; let activeInfPlayer = null;
+        let unsubscribeRoom = null;
         
         const defaultState = { 
             judgeName: "Judge",
@@ -284,9 +287,28 @@
             { id: 'energy', label: 'Energy' }, { id: 'power', label: 'Power' }
         ];
 
-        const triggerVibrate = () => { if (document.getElementById('toggle-haptic').checked && typeof navigator.vibrate === 'function') navigator.vibrate(20); };
+        // Beforeunload logic
+        window.addEventListener('beforeunload', (e) => {
+            if (currentRoom && userRole === 'admin') {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // TriggerVibrate modified: vibration removed
+        const triggerVibrate = () => {};
+        
         const sync = async () => { if (userRole !== 'admin' || !currentRoom) return; await setDoc(doc(db, 'matches', currentRoom), state); };
-        const addLog = (msg) => { const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); state.logs.unshift(`${t} - ${msg}`); if (state.logs.length > 60) state.logs.pop(); };
+        
+        const addLog = (msg) => { 
+            const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); 
+            state.logs.unshift(`${t} - ${msg}`); 
+            if (state.logs.length > 60) state.logs.pop(); 
+            // Local update of the last log for UI smoothness
+            const logEl = document.getElementById('ui-last-log');
+            if(logEl) logEl.innerText = state.logs[0];
+        };
+        
         const saveUndo = () => { undoStack.push(JSON.stringify(state)); if (undoStack.length > 20) undoStack.shift(); };
 
         const triggerFlash = (p) => {
@@ -353,7 +375,7 @@
                         state.p2.active = (p === 'p2');
                         state[p].runes = Math.min(12, state[p].runes + 2);
                         state.p1.energy = 0; state.p1.power = 0; state.p2.energy = 0; state.p2.power = 0;
-                        addLog(`[${state[p].name}] Turn started`); triggerFlash(p); sync(); render(); 
+                        addLog(`[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); triggerFlash(p); sync(); render(); 
                     }; 
                 });
             }
@@ -361,12 +383,17 @@
             document.getElementById('ui-judge-name').innerText = `JUDGE: ${state.judgeName || '---'}`;
 
             ['p1', 'p2'].forEach(p => {
-                document.getElementById(`name-text-${p}`).innerText = state[p].name;
-                document.getElementById(`turn-count-${p}`).innerText = `Turn ${state[p].turnCount}`;
-                document.getElementById(`board-${p}`).className = `player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden ${state[p].active ? `active-turn-${p}` : ''}`;
+                const nameEl = document.getElementById(`name-text-${p}`);
+                const turnEl = document.getElementById(`turn-count-${p}`);
+                const boardEl = document.getElementById(`board-${p}`);
+                const dotEl = document.getElementById(`dot-${p}`);
+                
+                if(nameEl) nameEl.innerText = state[p].name;
+                if(turnEl) turnEl.innerText = `Turn ${state[p].turnCount}`;
+                if(boardEl) boardEl.className = `player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden ${state[p].active ? `active-turn-${p}` : ''}`;
                 
                 const hasInf = state[p].infractions && state[p].infractions.length > 0;
-                document.getElementById(`dot-${p}`).className = hasInf ? 'inline-block' : 'hidden';
+                if(dotEl) dotEl.className = hasInf ? 'inline-block' : 'hidden';
 
                 if (editingPlayer === p) {
                     document.getElementById(`name-container-${p}`).classList.add('hidden');
@@ -375,7 +402,10 @@
                     document.getElementById(`name-container-${p}`).classList.remove('hidden');
                     document.getElementById(`name-edit-${p}`).classList.add('hidden');
                 }
-                stats.forEach(s => { document.getElementById(`val-${p}-${s.id}`).innerText = state[p][s.id]; });
+                stats.forEach(s => { 
+                    const valEl = document.getElementById(`val-${p}-${s.id}`);
+                    if(valEl) valEl.innerText = state[p][s.id]; 
+                });
             });
             document.getElementById('btn-flag').className = `w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition ${state.flag ? 'flag-active' : 'bg-slate-700'}`;
             if (state.logs[0]) document.getElementById('ui-last-log').innerText = state.logs[0];
@@ -471,7 +501,13 @@
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('ui-room-code').innerText = currentRoom;
-            onSnapshot(doc(db, 'matches', currentRoom), (s) => { if (s.exists()) { state = s.data(); render(); } });
+            if (unsubscribeRoom) unsubscribeRoom();
+            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
+                if (s.exists()) { 
+                    state = s.data(); 
+                    render(); 
+                } 
+            });
             render();
         }
 
@@ -481,7 +517,6 @@
         document.getElementById('btn-settings').onclick = () => { triggerVibrate(); document.getElementById('modal-settings').classList.remove('hidden'); };
         document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { triggerVibrate(); e.target.closest('.modal-overlay').classList.add('hidden'); });
         
-        // Export function
         const exportLogs = () => {
             const blob = new Blob([state.logs.join('\n')], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
@@ -498,7 +533,6 @@
         
         document.getElementById('btn-reset-match').onclick = async () => { 
             triggerVibrate(); 
-            // Ask for download before reset
             if (confirm("Download current Game Logs before resetting stats?")) {
                 exportLogs();
             }
@@ -512,7 +546,22 @@
                 resetData(state.p1); resetData(state.p2);
                 addLog("Game Reset"); await sync(); 
                 document.getElementById('modal-settings').classList.add('hidden');
+                render();
             } 
+        };
+
+        // Leave Room implementation
+        document.getElementById('btn-leave-room').onclick = () => {
+            if (confirm("Are you sure you want to leave this room?")) {
+                if (unsubscribeRoom) unsubscribeRoom();
+                currentRoom = null;
+                state = JSON.parse(JSON.stringify(defaultState));
+                undoStack = [];
+                document.getElementById('play-area').innerHTML = ''; // Force full re-render on re-entry
+                document.getElementById('app-screen').classList.add('hidden');
+                document.getElementById('setup-screen').classList.remove('hidden');
+                document.getElementById('modal-settings').classList.add('hidden');
+            }
         };
     </script>
 </body>
