@@ -416,16 +416,16 @@
                                 if (s.id === 'points') {
                                     return `<div id="card-${key}" class="stat-card" onclick="window.toggleStatFlag('${key}')">
                                         <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
-                                        <div class="flex items-center justify-between w-full px-1">
-                                            <div class="admin-only flex items-center gap-1">
-                                                <div class="w-[2.8rem] flex flex-col gap-1"></div> <button class="btn-stat !w-[2rem] !h-[2.6rem] !text-lg" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
+                                        <div class="flex items-center justify-around w-full gap-0.5">
+                                            <div class="admin-only flex items-center shrink">
+                                                <button class="btn-stat shrink !min-w-[1.5rem] !max-w-[2.2rem] w-full !h-[2.6rem] !text-lg transition-all" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
                                             </div>
                                             <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
-                                            <div class="admin-only flex items-center gap-1">
-                                                <button class="btn-stat !w-[2rem] !h-[2.6rem] !text-lg" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
-                                                <div class="flex flex-col gap-1">
-                                                    <button class="btn-stat !bg-orange-700 hover:!bg-orange-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
-                                                    <button class="btn-stat !bg-blue-700 hover:!bg-blue-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
+                                            <div class="admin-only flex items-center gap-1 shrink">
+                                                <button class="btn-stat shrink !min-w-[1.5rem] !max-w-[2.2rem] w-full !h-[2.6rem] !text-lg transition-all" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
+                                                <div class="flex flex-col gap-1 shrink-0">
+                                                    <button class="btn-stat !bg-orange-700 hover:!bg-orange-600 !w-[2.6rem] !h-[1.25rem] !text-[9px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
+                                                    <button class="btn-stat !bg-blue-700 hover:!bg-blue-600 !w-[2.6rem] !h-[1.25rem] !text-[9px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -638,7 +638,20 @@
             sync(); render(); 
         };
 
-        document.getElementById('btn-undo').onclick = () => { if (userRole === 'admin' && undoStack.length > 0) { state = JSON.parse(undoStack.pop()); sync(); render(); } };
+        document.getElementById('btn-undo').onclick = () => { 
+            if (userRole === 'admin' && undoStack.length > 0) { 
+                state = JSON.parse(undoStack.pop()); 
+                sync(); 
+                render(); 
+                if (!document.getElementById('modal-infractions').classList.contains('hidden') && activeInfPlayer) {
+                    updateInfList();
+                }
+                if (!document.getElementById('modal-log').classList.contains('hidden')) {
+                    document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join('');
+                }
+            } 
+        };
+
         document.getElementById('btn-log').onclick = () => { document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); document.getElementById('modal-log').classList.remove('hidden'); };
         
         document.getElementById('btn-copy-log').onclick = async () => {
@@ -698,7 +711,22 @@
             }
         };
         
-        window.toggleInfForm = (show) => { triggerVibrate(); const form = document.getElementById('inf-form'); const footer = document.getElementById('inf-footer'); if(show) { document.getElementById('inf-type').value = ""; form.classList.remove('hidden'); footer.classList.add('hidden'); } else { form.classList.add('hidden'); footer.classList.remove('hidden'); } };
+        window.toggleInfForm = (show) => { 
+            triggerVibrate(); 
+            const form = document.getElementById('inf-form'); 
+            const footer = document.getElementById('inf-footer'); 
+            if(show) { 
+                document.getElementById('inf-type').value = ""; 
+                document.getElementById('inf-subtype-container').classList.add('hidden');
+                document.getElementById('inf-penalty-container').classList.add('hidden');
+                document.getElementById('btn-add-infraction').disabled = true;
+                form.classList.remove('hidden'); 
+                footer.classList.add('hidden'); 
+            } else { 
+                form.classList.add('hidden'); 
+                footer.classList.remove('hidden'); 
+            } 
+        };
         document.getElementById('inf-type').onchange = (e) => { const type = e.target.value; const s = document.getElementById('inf-subtype'); s.innerHTML = '<option value="" disabled selected>Select Subtype</option>'; (infractionData[type]||[]).forEach(x=>{ const o=document.createElement('option'); o.value=x; o.innerText=x; s.appendChild(o); }); document.getElementById('inf-subtype-container').classList.remove('hidden'); document.getElementById('inf-penalty-container').classList.add('hidden'); document.getElementById('btn-add-infraction').disabled = true; };
         document.getElementById('inf-subtype').onchange = () => { document.getElementById('inf-penalty-container').classList.remove('hidden'); };
         document.getElementById('inf-penalty').onchange = () => { document.getElementById('btn-add-infraction').disabled = false; };
