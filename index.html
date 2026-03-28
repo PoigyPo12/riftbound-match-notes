@@ -74,7 +74,10 @@
         }
 
         .play-area { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.75rem; padding-bottom: 3rem; }
-        @media (min-width: 768px), (orientation: landscape) { .play-area { flex-direction: row; } .player-board { flex: 1; } }
+        @media (min-width: 768px), (orientation: landscape) { 
+            .play-area { flex-direction: row; align-items: stretch; } 
+            .player-board { flex: 1; min-height: 400px; } 
+        }
         
         .modal-overlay { background-color: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
         .edit-input { background: #0f172a; border: 1px solid #14b8a6; border-radius: 4px; padding: 2px 8px; color: white; width: 120px; outline: none; }
@@ -96,14 +99,27 @@
             pointer-events: none;
         }
 
-        /* Fixed settings icon container to prevent clipping */
-        .icon-btn {
+        .infraction-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        .btn-shield {
+            background-color: rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 0.5rem;
+            width: 2rem;
+            height: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
-            overflow: hidden;
+            transition: all 0.2s;
         }
+        .btn-shield:active { transform: scale(0.9); background-color: rgba(51, 65, 85, 0.8); }
     </style>
 </head>
 <body class="safe-padding">
@@ -148,10 +164,10 @@
                 <button id="btn-log" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </button>
-                <button id="btn-settings" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center icon-btn active:scale-90 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <button id="btn-settings" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition overflow-hidden">
+                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
                 </button>
             </div>
@@ -159,12 +175,63 @@
         
         <main class="play-area flex-grow" id="play-area"></main>
         
-        <footer class="footer-log" id="ui-last-log">
-            Ready
-        </footer>
+        <footer class="footer-log" id="ui-last-log">Ready</footer>
     </div>
 
-    <!-- Modals -->
+    <!-- Infractions Modal -->
+    <div id="modal-infractions" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50 backdrop-blur">
+                <h3 class="font-bold flex items-center gap-2">
+                    🛡️ <span id="inf-player-name" class="text-teal-400"></span>
+                </h3>
+                <button class="close-modal p-2">✕</button>
+            </div>
+            
+            <div class="overflow-y-auto p-6 space-y-4 flex-1">
+                <!-- History Section -->
+                <div>
+                    <label class="text-[10px] uppercase font-bold text-slate-500 block mb-3 tracking-widest">History</label>
+                    <div id="inf-list" class="space-y-2"></div>
+                </div>
+
+                <!-- Add New Form (Hidden by default) -->
+                <div id="inf-form" class="hidden border-t border-slate-700 pt-6 mt-4 animate-in slide-in-from-bottom-4 duration-300">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Type</label>
+                            <select id="inf-type" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                                <option value="Gameplay Error">Gameplay Error</option>
+                                <option value="Tournament Error">Tournament Error</option>
+                                <option value="Unsporting Conduct">Unsporting Conduct</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Penalty Assigned</label>
+                            <select id="inf-penalty" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                                <option value="Warning">Warning</option>
+                                <option value="Game Loss">Game Loss</option>
+                                <option value="Match Loss">Match Loss</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="toggleInfForm(false)" class="flex-1 bg-slate-700 text-white font-bold py-3 rounded-xl">Cancel</button>
+                            <button id="btn-add-infraction" class="flex-[2] bg-red-600 text-white font-bold py-3 rounded-xl">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gavel Button Footer -->
+            <div id="inf-footer" class="p-4 border-t border-slate-700 bg-slate-900/50 admin-only">
+                <button onclick="toggleInfForm(true)" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition">
+                    <span>🔨</span> Assign New Penalty
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Modals -->
     <div id="modal-log" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-lg h-[80vh] flex flex-col border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Match History</h3><button class="close-modal p-2">✕</button></div>
@@ -202,30 +269,22 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let userRole = 'viewer'; let currentRoom = null; let undoStack = []; let wakeLock = null; let editingPlayer = null;
+        let userRole = 'viewer'; let currentRoom = null; let undoStack = []; let editingPlayer = null; let activeInfPlayer = null;
         
         const defaultState = { 
             judgeName: "Judge",
-            p1: { name: "Player 1", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, active: false, turnCount: 0 }, 
-            p2: { name: "Player 2", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, active: false, turnCount: 0 }, 
+            p1: { name: "Player 1", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, active: false, turnCount: 0, infractions: [] }, 
+            p2: { name: "Player 2", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, active: false, turnCount: 0, infractions: [] }, 
             flag: false, logs: [] 
         };
         let state = JSON.parse(JSON.stringify(defaultState));
         const stats = [
-            { id: 'points', label: 'Points' }, 
-            { id: 'xp', label: 'XP' }, 
-            { id: 'runes', label: '🌀 Runes' }, 
-            { id: 'hand', label: '🖐🏻 Hand' }, 
-            { id: 'energy', label: 'Energy' }, 
-            { id: 'power', label: 'Power' }
+            { id: 'points', label: 'Points' }, { id: 'xp', label: 'XP' }, 
+            { id: 'runes', label: '🌀 Runes' }, { id: 'hand', label: '🖐🏻 Hand' }, 
+            { id: 'energy', label: 'Energy' }, { id: 'power', label: 'Power' }
         ];
 
-        const triggerVibrate = () => {
-            if (document.getElementById('toggle-haptic').checked && typeof navigator.vibrate === 'function') {
-                navigator.vibrate(20);
-            }
-        };
-
+        const triggerVibrate = () => { if (document.getElementById('toggle-haptic').checked && typeof navigator.vibrate === 'function') navigator.vibrate(20); };
         const sync = async () => { if (userRole !== 'admin' || !currentRoom) return; await setDoc(doc(db, 'matches', currentRoom), state); };
         const addLog = (msg) => { const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); state.logs.unshift(`${t} - ${msg}`); if (state.logs.length > 60) state.logs.pop(); };
         const saveUndo = () => { undoStack.push(JSON.stringify(state)); if (undoStack.length > 20) undoStack.shift(); };
@@ -246,11 +305,15 @@
                         <div id="flash-overlay-${p}" class="absolute inset-0 pointer-events-none z-0"></div>
                         <div class="flex justify-between items-start mb-4 relative z-10">
                             <div>
-                                <div id="name-container-${p}" class="flex items-center gap-2">
+                                <div id="name-container-${p}" class="flex items-center gap-2 mb-1">
                                     <h2 class="font-bold text-lg" id="name-text-${p}"></h2>
-                                    <button onclick="startEditName('${p}')" class="admin-only opacity-40 p-1">✎</button>
+                                    <div id="dot-${p}" class="hidden"><span class="infraction-dot"></span></div>
+                                    <div class="flex items-center gap-3 ml-2">
+                                        <button onclick="startEditName('${p}')" class="admin-only opacity-30 p-1 text-xs">✎</button>
+                                        <button onclick="openInfractions('${p}')" class="btn-shield text-sm">🛡️</button>
+                                    </div>
                                 </div>
-                                <div id="name-edit-${p}" class="hidden flex items-center gap-1">
+                                <div id="name-edit-${p}" class="hidden flex items-center gap-1 mb-1">
                                     <input type="text" id="input-name-${p}" class="edit-input text-sm">
                                     <button onclick="saveName('${p}')" class="text-teal-400 font-bold">✓</button>
                                 </div>
@@ -285,35 +348,26 @@
                     document.getElementById(`next-${p}`).onclick = () => { 
                         if (userRole !== 'admin') return; 
                         triggerVibrate(); saveUndo(); 
-                        
                         state[p].turnCount++; 
                         state.p1.active = (p === 'p1'); 
                         state.p2.active = (p === 'p2');
-                        
-                        // Local resource logic (Runes only for active player)
                         state[p].runes = Math.min(12, state[p].runes + 2);
-
-                        // SHARED RESET: Energy and Power reset for BOTH players
-                        state.p1.energy = 0;
-                        state.p1.power = 0;
-                        state.p2.energy = 0;
-                        state.p2.power = 0;
-
-                        addLog(`T${state[p].turnCount} [${state[p].name}]: Turn Started`); 
-                        triggerFlash(p); 
-                        sync(); 
-                        render(); 
+                        state.p1.energy = 0; state.p1.power = 0; state.p2.energy = 0; state.p2.power = 0;
+                        addLog(`[${state[p].name}] Turn started`); triggerFlash(p); sync(); render(); 
                     }; 
                 });
             }
             
-            document.getElementById('ui-judge-name').innerText = `JUDGE: ${state.judgeName || 'Unknown'}`;
+            document.getElementById('ui-judge-name').innerText = `JUDGE: ${state.judgeName || '---'}`;
 
             ['p1', 'p2'].forEach(p => {
                 document.getElementById(`name-text-${p}`).innerText = state[p].name;
                 document.getElementById(`turn-count-${p}`).innerText = `Turn ${state[p].turnCount}`;
                 document.getElementById(`board-${p}`).className = `player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden ${state[p].active ? `active-turn-${p}` : ''}`;
                 
+                const hasInf = state[p].infractions && state[p].infractions.length > 0;
+                document.getElementById(`dot-${p}`).className = hasInf ? 'inline-block' : 'hidden';
+
                 if (editingPlayer === p) {
                     document.getElementById(`name-container-${p}`).classList.add('hidden');
                     document.getElementById(`name-edit-${p}`).classList.remove('hidden');
@@ -321,7 +375,6 @@
                     document.getElementById(`name-container-${p}`).classList.remove('hidden');
                     document.getElementById(`name-edit-${p}`).classList.add('hidden');
                 }
-                
                 stats.forEach(s => { document.getElementById(`val-${p}-${s.id}`).innerText = state[p][s.id]; });
             });
             document.getElementById('btn-flag').className = `w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition ${state.flag ? 'flag-active' : 'bg-slate-700'}`;
@@ -341,6 +394,59 @@
             saveUndo(); const oldVal = state[p][s]; state[p][s] = Math.max(0, state[p][s] + d); 
             if (oldVal !== state[p][s]) { addLog(`[${state[p].name}] ${stats.find(x=>x.id===s).label}: ${oldVal} -> ${state[p][s]}`); }
             sync(); render();
+        };
+
+        // Infractions Modal Control
+        window.toggleInfForm = (show) => {
+            triggerVibrate();
+            const form = document.getElementById('inf-form');
+            const footer = document.getElementById('inf-footer');
+            if(show) {
+                form.classList.remove('hidden');
+                footer.classList.add('hidden');
+            } else {
+                form.classList.add('hidden');
+                footer.classList.remove('hidden');
+            }
+        };
+
+        window.openInfractions = (p) => {
+            triggerVibrate();
+            activeInfPlayer = p;
+            document.getElementById('inf-player-name').innerText = state[p].name;
+            toggleInfForm(false);
+            updateInfList();
+            document.getElementById('modal-infractions').classList.remove('hidden');
+        };
+
+        function updateInfList() {
+            const list = document.getElementById('inf-list');
+            const p = activeInfPlayer;
+            if (!state[p].infractions) state[p].infractions = [];
+            list.innerHTML = state[p].infractions.length 
+                ? state[p].infractions.map(inf => `
+                    <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-700/50 flex flex-col gap-1">
+                        <div class="text-[11px] font-bold text-slate-200 uppercase tracking-tight">${inf}</div>
+                    </div>`).join('')
+                : `<div class="text-xs text-slate-500 italic text-center py-8">No infractions recorded for this room.</div>`;
+        }
+
+        document.getElementById('btn-add-infraction').onclick = () => {
+            if (userRole !== 'admin') return;
+            triggerVibrate();
+            const type = document.getElementById('inf-type').value;
+            const penalty = document.getElementById('inf-penalty').value;
+            const entry = `${type} - ${penalty}`;
+            
+            saveUndo();
+            if (!state[activeInfPlayer].infractions) state[activeInfPlayer].infractions = [];
+            state[activeInfPlayer].infractions.push(entry);
+            addLog(`[${state[activeInfPlayer].name}] ${entry}`);
+            
+            sync();
+            updateInfList();
+            toggleInfForm(false);
+            render();
         };
 
         onAuthStateChanged(auth, async u => { if (!u) await signInAnonymously(auth); });
@@ -366,18 +472,11 @@
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('ui-room-code').innerText = currentRoom;
-            onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
-                if (s.exists()) { 
-                    const data = s.data();
-                    if (data.p1.turnCount !== state.p1.turnCount) triggerFlash('p1');
-                    if (data.p2.turnCount !== state.p2.turnCount) triggerFlash('p2');
-                    state = data; render(); 
-                } 
-            });
+            onSnapshot(doc(db, 'matches', currentRoom), (s) => { if (s.exists()) { state = s.data(); render(); } });
             render();
         }
 
-        document.getElementById('btn-flag').onclick = () => { triggerVibrate(); if (userRole !== 'admin') return; saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ SOLVED"); sync(); render(); };
+        document.getElementById('btn-flag').onclick = () => { triggerVibrate(); if (userRole !== 'admin') return; saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ RESOLVED"); sync(); render(); };
         document.getElementById('btn-undo').onclick = () => { triggerVibrate(); if (undoStack.length > 0) { state = JSON.parse(undoStack.pop()); sync(); render(); } };
         document.getElementById('btn-log').onclick = () => { triggerVibrate(); document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); document.getElementById('modal-log').classList.remove('hidden'); };
         document.getElementById('btn-settings').onclick = () => { triggerVibrate(); document.getElementById('modal-settings').classList.remove('hidden'); };
@@ -386,19 +485,14 @@
         
         document.getElementById('btn-reset-match').onclick = async () => { 
             triggerVibrate(); 
-            if (confirm("Are you sure you want to reset the match?")) { 
-                if (confirm("Do you want to download the log file before clearing?")) {
-                    const blob = new Blob([state.logs.join('\n')], { type: 'text/plain' });
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `MatchLog_${currentRoom}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(a.href);
-                }
-                const n1 = state.p1.name, n2 = state.p2.name, jName = state.judgeName; 
-                state = JSON.parse(JSON.stringify(defaultState)); 
-                state.p1.name = n1; state.p2.name = n2; state.judgeName = jName;
-                addLog("Match Reset"); await sync(); 
+            if (confirm("Reset game stats? Infractions will be KEPT.")) { 
+                saveUndo();
+                const resetData = (p) => {
+                    p.points = 0; p.xp = 0; p.hand = 4; p.runes = 0;
+                    p.energy = 0; p.power = 0; p.active = false; p.turnCount = 0;
+                };
+                resetData(state.p1); resetData(state.p2);
+                addLog("Match Reset (Stats cleared)"); await sync(); 
                 document.getElementById('modal-settings').classList.add('hidden');
             } 
         };
