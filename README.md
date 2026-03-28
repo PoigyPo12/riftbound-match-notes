@@ -18,9 +18,9 @@ The system uses a **Room Code** architecture to connect devices via Firebase wit
 ## 2. Judging Utilities
 
 ### The "My Turn" Logic & Automation
-To ensure the log and resources are accurate, the Judge must trigger the **"My Turn"** button for the player starting their turn. This action performs several automated tasks:
-* **Resource Reset**: Clears the current *Energy* and *Power* for both players.
-* **Rune Generation**: Automatically adds **+2 Runes** to the active player (capped at 12).
+To ensure the log and resources are accurate, the Judge must trigger the **"My Turn"** button for the player starting their turn (*also for the first turn of each game*). This action performs several automated tasks:
+* **Resource Reset**: Clears the current *Energy* and *Power* for both players; they are indicators for resources stored in the *Rune Pool*.
+* **Rune Channeling**: Automatically adds **2 Runes** to the active player (capped at 12).
 * **Turn Counter**: Increments the turn count for the active player.
 * **Global Sync**: Updates the turn status for all Viewers and logs the event with a timestamp.
 
