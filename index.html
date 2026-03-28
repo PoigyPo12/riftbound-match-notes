@@ -34,10 +34,22 @@
         }
 
         .theme-p1 { background-color: rgba(13, 148, 136, 0.1); border-color: rgba(13, 148, 136, 0.3); }
-        .theme-p2 { background-color: rgba(225, 29, 72, 0.1); border-color: rgba(225, 29, 72, 0.3); }
+        .theme-p2 { background-color: rgba(249, 115, 22, 0.05); border-color: rgba(249, 115, 22, 0.15); }
         
         .active-turn-p1 { border-color: rgba(20, 184, 166, 0.8); box-shadow: 0 0 20px rgba(20, 184, 166, 0.1) inset; }
-        .active-turn-p2 { border-color: rgba(244, 63, 94, 0.8); box-shadow: 0 0 20px rgba(244, 63, 94, 0.1) inset; }
+        .active-turn-p2 { border-color: rgba(249, 115, 22, 0.8); box-shadow: 0 0 20px rgba(249, 115, 22, 0.1) inset; }
+
+        .turn-flash { 
+            animation: flash-glow-intense 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 50 !important;
+            overflow: visible !important; 
+        }
+
+        @keyframes flash-glow-intense { 
+            0% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+            30% { transform: scale(1.01); filter: brightness(1.5); box-shadow: 0 0 30px 10px rgba(255, 255, 255, 0.4); }
+            100% { transform: scale(1); filter: brightness(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
 
         .stat-card { 
             background-color: rgba(30, 41, 59, 0.8); 
@@ -47,6 +59,13 @@
             flex-direction: column; 
             align-items: center; 
             border: 1px solid rgba(255,255,255,0.05); 
+            transition: all 0.3s ease;
+        }
+        
+        .stat-flagged {
+            background-color: rgba(220, 38, 38, 0.25) !important;
+            border: 1px solid rgba(220, 38, 38, 0.6) !important;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
         }
 
         .btn-stat { 
@@ -67,6 +86,21 @@
         }
         .btn-stat:active { background-color: #475569; transform: scale(0.92); }
 
+        .judge-call-active::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-color: rgba(220, 38, 38, 0.15);
+            pointer-events: none;
+            z-index: 9999;
+            animation: pulse-overlay 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse-overlay {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
         .flag-active { animation: pulse-red 2s infinite; background-color: #b91c1c !important; }
         @keyframes pulse-red { 
             0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); } 
@@ -74,7 +108,7 @@
             100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } 
         }
 
-        .play-area { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.75rem; padding-bottom: 3rem; }
+        .play-area { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.75rem; padding-bottom: 1rem; }
         @media (min-width: 768px), (orientation: landscape) { 
             .play-area { flex-direction: row; align-items: stretch; } 
             .player-board { flex: 1; min-height: 400px; } 
@@ -128,16 +162,38 @@
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #14b8a6; }
         input:checked + .slider:before { transform: translateX(20px); }
+
+        .timer-container {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 1rem;
+            margin: 0 0.75rem 4rem 0.75rem;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: #f8fafc;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body class="safe-padding">
 
-    <!-- Setup Screen -->
     <div id="setup-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700">
             <h1 class="text-3xl font-bold text-center mb-8 text-teal-400">RB Match Buddy</h1>
             <div class="space-y-5">
-                <input type="text" id="setup-user-name" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Judge Name">
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" id="setup-user-name" class="col-span-2 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Judge Name">
+                    <input type="number" id="setup-table-num" class="col-span-1 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Table">
+                </div>
                 <div class="space-y-3">
                     <input type="text" id="setup-p1-name" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Player 1">
                     <input type="text" id="setup-p2-name" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Player 2">
@@ -152,13 +208,14 @@
         </div>
     </div>
 
-    <!-- App Screen -->
     <div id="app-screen" class="hidden min-h-screen flex flex-col relative">
         <header class="h-16 bg-slate-800/80 sticky top-0 z-40 border-b border-slate-700 flex justify-between items-center px-4 shrink-0 backdrop-blur-sm gap-2">
             <div class="flex flex-col min-w-0 flex-1 justify-center">
                 <div class="flex items-center gap-2">
-                    <span class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">Room</span>
-                    <span id="ui-room-code" class="text-xl font-mono font-black text-teal-300 tracking-widest bg-teal-900/40 px-3 py-0.5 rounded border border-teal-700/50 shadow-sm">----</span>
+                    <span class="text-[9px] uppercase text-slate-400 font-bold tracking-wider">Room</span>
+                    <span id="ui-room-code" class="text-lg font-mono font-black text-teal-300 tracking-wider bg-teal-900/40 px-2 py-0.5 rounded border border-teal-700/50">----</span>
+                    <span class="text-[9px] uppercase text-slate-400 font-bold tracking-wider ml-1">Tbl</span>
+                    <span id="ui-table-num" class="text-lg font-mono font-black text-amber-400 tracking-wider bg-amber-900/40 px-2 py-0.5 rounded border border-amber-700/50">0</span>
                 </div>
                 <span id="ui-judge-name" class="text-[9px] text-slate-500 font-medium truncate mt-0.5 uppercase tracking-wide">JUDGE: ---</span>
             </div>
@@ -180,13 +237,27 @@
                 </button>
             </div>
         </header>
+
+        <div id="viewer-hint" class="hidden text-center text-[10px] text-teal-500 pt-4 pb-2 px-6 uppercase font-black tracking-widest leading-tight">
+            Tap on a stat to flag it to the judge; you'll unflag it, too
+        </div>
         
-        <main class="play-area flex-grow" id="play-area"></main>
+        <main class="play-area flex-none" id="play-area"></main>
+
+        <div class="timer-container">
+            <span class="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Extra Time*</span>
+            <div id="timer-val" class="timer-display">00:00</div>
+            <div class="admin-only flex gap-3 mt-2">
+                <button id="btn-timer-toggle" class="bg-teal-600 hover:bg-teal-500 px-5 py-2 rounded-full font-bold text-[10px] uppercase transition active:scale-95">Start</button>
+                <button id="btn-timer-set" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-2 rounded-full font-bold text-[10px] uppercase transition active:scale-95">Set</button>
+                <button id="btn-timer-reset" class="bg-slate-700 hover:bg-slate-600 px-5 py-2 rounded-full font-bold text-[10px] uppercase transition active:scale-95">Reset</button>
+            </div>
+            <span class="text-[9px] text-slate-600 italic mt-2">*since start of match. Always check PurpleFox</span>
+        </div>
         
         <footer class="footer-log" id="ui-last-log">Ready</footer>
     </div>
 
-    <!-- Modal Confirm -->
     <div id="modal-confirm" class="modal-overlay fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-xs border border-slate-700 shadow-2xl p-6 flex flex-col items-center text-center">
             <h3 id="confirm-msg" class="font-bold text-slate-200 text-lg mb-6">Are you sure?</h3>
@@ -194,110 +265,42 @@
         </div>
     </div>
 
-    <!-- Infractions Modal -->
     <div id="modal-infractions" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50 backdrop-blur">
-                <h3 class="font-bold flex items-center gap-2">
-                    🛡️ <span id="inf-player-name" class="text-teal-400"></span>
-                </h3>
+                <h3 class="font-bold flex items-center gap-2">🛡️ <span id="inf-player-name" class="text-teal-400"></span></h3>
                 <button class="close-modal p-2">✕</button>
             </div>
-            
             <div class="overflow-y-auto p-6 space-y-4 flex-1">
-                <div>
-                    <label class="text-[10px] uppercase font-bold text-slate-500 block mb-3 tracking-widest">History</label>
-                    <div id="inf-list" class="space-y-2"></div>
-                </div>
+                <div><label class="text-[10px] uppercase font-bold text-slate-500 block mb-3 tracking-widest">History</label><div id="inf-list" class="space-y-2"></div></div>
                 <div id="inf-form" class="hidden border-t border-slate-700 pt-6 mt-4">
                     <div class="space-y-4">
-                        <!-- Step 1: Infraction Type -->
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Type</label>
-                            <select id="inf-type" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-                                <option value="" disabled selected>Select Type</option>
-                                <option value="GPE">GPE</option>
-                                <option value="TE">TE</option>
-                                <option value="US">US</option>
-                            </select>
-                        </div>
-                        <!-- Step 2: Infraction Subtype -->
-                        <div id="inf-subtype-container" class="hidden">
-                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Subtype</label>
-                            <select id="inf-subtype" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-                                <option value="" disabled selected>Select Subtype</option>
-                            </select>
-                        </div>
-                        <!-- Step 3: Penalty -->
-                        <div id="inf-penalty-container" class="hidden">
-                            <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Penalty</label>
-                            <select id="inf-penalty" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-                                <option value="" disabled selected>Select Penalty</option>
-                                <option value="No Penalty">No Penalty</option>
-                                <option value="Warning">Warning</option>
-                                <option value="Game Loss">Game Loss</option>
-                                <option value="Match Loss">Match Loss</option>
-                                <option value="DQ">DQ</option>
-                            </select>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <button onclick="toggleInfForm(false)" class="flex-1 bg-slate-700 text-white font-bold py-3 rounded-xl">Cancel</button>
-                            <button id="btn-add-infraction" disabled class="flex-[2] bg-red-600 disabled:bg-slate-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl">Assign Penalty</button>
-                        </div>
+                        <div><label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Type</label><select id="inf-type" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"><option value="" disabled selected>Select Type</option><option value="GPE">GPE</option><option value="TE">TE</option><option value="UC">UC</option></select></div>
+                        <div id="inf-subtype-container" class="hidden"><label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Infraction Subtype</label><select id="inf-subtype" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"><option value="" disabled selected>Select Subtype</option></select></div>
+                        <div id="inf-penalty-container" class="hidden"><label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Penalty</label><select id="inf-penalty" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"><option value="" disabled selected>Select Penalty</option><option value="No Penalty">No Penalty</option><option value="Warning">Warning</option><option value="Game Loss">Game Loss</option><option value="Match Loss">Match Loss</option><option value="DQ">DQ</option></select></div>
+                        <div class="flex gap-2"><button onclick="toggleInfForm(false)" class="flex-1 bg-slate-700 text-white font-bold py-3 rounded-xl">Cancel</button><button id="btn-add-infraction" disabled class="flex-[2] bg-red-600 disabled:bg-slate-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl">Assign Penalty</button></div>
                     </div>
                 </div>
             </div>
-            <div id="inf-footer" class="p-4 border-t border-slate-700 bg-slate-900/50 admin-only">
-                <button onclick="toggleInfForm(true)" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition">
-                    <span>🔨</span> Assign New Penalty
-                </button>
-            </div>
+            <div id="inf-footer" class="p-4 border-t border-slate-700 bg-slate-900/50 admin-only"><button onclick="toggleInfForm(true)" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition"><span>🔨</span> Assign New Penalty</button></div>
         </div>
     </div>
 
-    <!-- Log Modal -->
     <div id="modal-log" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-lg h-[80vh] flex flex-col border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Match History</h3><button class="close-modal p-2">✕</button></div>
             <div id="log-container" class="p-4 overflow-y-auto flex-1 font-mono text-xs space-y-2"></div>
-            <div class="p-4 border-t border-slate-700 grid grid-cols-2 gap-2">
-                <button id="btn-copy-log" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    Copy
-                </button>
-                <button id="btn-export" class="bg-teal-700 hover:bg-teal-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Download
-                </button>
-            </div>
+            <div class="p-4 border-t border-slate-700 grid grid-cols-2 gap-2"><button id="btn-copy-log" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span id="copy-btn-text">Copy</span></button><button id="btn-export" class="bg-teal-700 hover:bg-teal-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Download</button></div>
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div id="modal-settings" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Settings</h3><button class="close-modal p-2">✕</button></div>
             <div class="p-6 space-y-6">
-                <div class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700">
-                    <div>
-                        <span class="block font-bold text-slate-200">Wake Lock</span>
-                        <span class="text-[10px] text-slate-500 uppercase font-black">Keep Screen On</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-wakelock">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-4 rounded-xl font-bold admin-only hover:bg-red-800 transition uppercase tracking-widest text-xs">Reset</button>
-
-                <div class="border-t border-slate-700 pt-6 space-y-3">
-                    <a href="https://poigypo12.github.io/riftbound-auditor/" target="_blank" class="w-full bg-indigo-900/50 border border-indigo-700 hover:bg-indigo-800/80 text-indigo-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2 text-sm uppercase">
-                        <span>📊</span> Auditor Tool
-                    </a>
-                    <button id="btn-leave-room" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-3 rounded-xl font-bold transition text-sm uppercase">Leave Room</button>
-                </div>
+                <div class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700"><div><span class="block font-bold text-slate-200">Wake Lock</span><span class="text-[10px] text-slate-500 uppercase font-black">Keep Screen On</span></div><label class="switch"><input type="checkbox" id="toggle-wakelock"><span class="slider"></span></label></div>
+                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-5 rounded-xl font-bold admin-only hover:bg-red-800 transition uppercase tracking-[0.2em] text-sm shadow-lg">Reset Game</button>
+                <div class="border-t border-slate-700 pt-6 space-y-3"><a href="https://poigypo12.github.io/riftbound-auditor/" target="_blank" class="w-full bg-indigo-900/50 border border-indigo-700 hover:bg-indigo-800/80 text-indigo-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2 text-sm uppercase"><span>📊</span> Auditor Tool</a><button id="btn-leave-room" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-3 rounded-xl font-bold transition text-sm uppercase">Leave Room</button></div>
             </div>
         </div>
     </div>
@@ -316,37 +319,25 @@
             appId: "1:572843702141:web:7e82385fc04c6678aebe14"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const fApp = initializeApp(firebaseConfig);
+        const auth = getAuth(fApp);
+        const db = getFirestore(fApp);
 
         let userRole = 'viewer'; let currentRoom = null; let undoStack = []; let editingPlayer = null; let activeInfPlayer = null;
-        let unsubscribeRoom = null;
-        let wakeLock = null;
+        let unsubscribeRoom = null; let wakeLock = null; let timerInterval = null;
 
         const infractionData = {
-            "GPE": [
-                "Missed Trigger", "Forgetting to score a point", "Forgetting to draw cards", 
-                "Looking at extra cards", "Channeling too many runes", "Channeling too few runes", 
-                "Overpayment for cost", "Mispayment for cost", "Looking at secret information", 
-                "Looking at opponent private information", "Drawing extra cards", 
-                "Nonpublic card error", "Mulligan procedure", "General error", "Failure to maintain game state"
-            ],
-            "TE": [
-                "Slowplay", "Decklist error", "Deck presentation error", "Communication violation", 
-                "Marked cards", "Insufficient randomization", "Late to match", "Outside assistance", 
-                "Improperly determining a winner"
-            ],
-            "US": [
-                "Unsporting minor", "Unsporting major", "Angle shooting", "Bribery", "Wagering", "Theft", "Cheating"
-            ]
+            "GPE": [ "Missed Trigger", "Forgetting to score a point", "Forgetting to draw cards", "Looking at extra cards", "Channeling too many runes", "Channeling too few runes", "Overpayment for cost", "Mispayment for cost", "Looking at secret information", "Looking at opponent private information", "Drawing extra cards", "Nonpublic card error", "Mulligan procedure", "General error", "Failure to maintain game state" ],
+            "TE": [ "Slowplay", "Decklist error", "Deck presentation error", "Communication violation", "Marked cards", "Insufficient randomization", "Late to match", "Outside assistance", "Improperly determining a winner" ],
+            "UC": [ "Unsporting minor", "Unsporting major", "Angle shooting", "Bribery", "Wagering", "Theft", "Cheating" ]
         };
         
         const defaultState = { 
-            judgeName: "Judge",
+            judgeName: "Judge", tableNum: 0,
             p1: { name: "Player 1", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, recycled: 0, active: false, turnCount: 0, infractions: [] }, 
             p2: { name: "Player 2", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, recycled: 0, active: false, turnCount: 0, infractions: [] }, 
-            flag: false, logs: [] 
+            flag: false, flagIssuer: null, flaggedStats: {}, logs: [],
+            timerSeconds: 0, timerActive: false
         };
         let state = JSON.parse(JSON.stringify(defaultState));
         const stats = [
@@ -357,9 +348,9 @@
         ];
 
         const triggerVibrate = () => { if (navigator.vibrate) navigator.vibrate(10); };
-        
-        const sync = async () => { if (userRole !== 'admin' || !currentRoom) return; await setDoc(doc(db, 'matches', currentRoom), state); };
-        
+        const sync = async () => { if (!currentRoom) return; await setDoc(doc(db, 'matches', currentRoom), state); };
+        const saveUndo = () => { undoStack.push(JSON.stringify(state)); if (undoStack.length > 30) undoStack.shift(); };
+
         const addLog = (msg) => { 
             const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); 
             state.logs.unshift(`${t} - ${msg}`); 
@@ -371,8 +362,29 @@
             const logEl = document.getElementById('ui-last-log');
             if(logEl) logEl.innerText = state.logs[0] || "Ready";
         };
-        
-        const saveUndo = () => { undoStack.push(JSON.stringify(state)); if (undoStack.length > 30) undoStack.shift(); };
+
+        const formatTime = (s) => {
+            const mins = Math.floor(s / 60);
+            const secs = s % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        const updateTimerDisplay = () => {
+            document.getElementById('timer-val').innerText = formatTime(state.timerSeconds || 0);
+            const btn = document.getElementById('btn-timer-toggle');
+            if(btn) btn.innerText = state.timerActive ? 'Pause' : 'Start';
+        };
+
+        const startLocalTimer = () => {
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(state.timerActive) {
+                    state.timerSeconds++;
+                    updateTimerDisplay();
+                    if(userRole === 'admin' && state.timerSeconds % 5 === 0) sync(); 
+                }
+            }, 1000);
+        };
 
         const render = () => {
             const container = document.getElementById('play-area');
@@ -385,13 +397,14 @@
                                     <h2 class="font-bold text-lg" id="name-text-${p}"></h2>
                                     <div id="dot-${p}" class="hidden"><span class="infraction-dot"></span></div>
                                     <div class="flex items-center gap-3 ml-2">
-                                        <button onclick="startEditName('${p}')" class="admin-only opacity-30 p-1 text-xs">✎</button>
+                                        <button onclick="startEditName('${p}')" class="admin-only opacity-50 p-1 text-xl leading-none">✎</button>
                                         <button onclick="openInfractions('${p}')" class="btn-shield text-sm">🛡️</button>
                                     </div>
                                 </div>
                                 <div id="name-edit-${p}" class="hidden flex items-center gap-1 mb-1">
                                     <input type="text" id="input-name-${p}" class="edit-input text-sm">
-                                    <button onclick="saveName('${p}')" class="text-teal-400 font-bold">✓</button>
+                                    <button onclick="saveName('${p}')" class="text-teal-400 font-bold px-1 text-lg">✓</button>
+                                    <button onclick="cancelEditName()" class="text-red-400 font-bold px-1 ml-1 text-lg">X</button>
                                 </div>
                                 <span class="text-[10px] text-slate-500 font-black uppercase" id="turn-count-${p}"></span>
                             </div>
@@ -399,32 +412,23 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 flex-1 relative z-10">
                             ${stats.map(s => {
-                                if(s.id === 'points') {
-                                    return `
-                                        <div class="stat-card">
-                                            <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
-                                            <div class="flex items-center justify-between w-full px-1">
-                                                <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="-1" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
-                                                <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
-                                                <div class="flex flex-col justify-between h-[2.6rem]">
-                                                    <button class="btn-stat admin-only !bg-orange-700 hover:!bg-orange-600 !w-[2.8rem] !h-[1.2rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
-                                                    <button class="btn-stat admin-only !bg-blue-700 hover:!bg-blue-600 !w-[2.8rem] !h-[1.2rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
+                                const key = `${p}-${s.id}`;
+                                return `<div id="card-${key}" class="stat-card ${s.id === 'recycled' ? 'col-span-2' : ''}" onclick="window.toggleStatFlag('${key}')">
+                                    <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button class="btn-stat admin-only" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
+                                        <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
+                                        ${s.id === 'points' ? `
+                                            <div class="flex items-center gap-1">
+                                                <button class="btn-stat admin-only !w-[2rem] !h-[2.6rem] !text-lg" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
+                                                <div class="flex flex-col gap-1">
+                                                    <button class="btn-stat admin-only !bg-orange-700 hover:!bg-orange-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Conquer')">+C</button>
+                                                    <button class="btn-stat admin-only !bg-blue-700 hover:!bg-blue-600 !w-[2.8rem] !h-[1.25rem] !text-[10px] !rounded-sm leading-none" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1, 'Hold')">+H</button>
                                                 </div>
                                             </div>
-                                        </div>
-                                    `;
-                                }
-                                const spanClass = s.id === 'recycled' ? 'col-span-2' : '';
-                                return `
-                                    <div class="stat-card ${spanClass}">
-                                        <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
-                                        <div class="flex items-center justify-between w-full px-1">
-                                            <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="-1" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
-                                            <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
-                                            <button class="btn-stat admin-only" data-p="${p}" data-s="${s.id}" data-d="1" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>
-                                        </div>
+                                        ` : `<button class="btn-stat admin-only" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', 1)">+</button>`}
                                     </div>
-                                `;
+                                </div>`;
                             }).join('')}
                         </div>
                     </div>`).join('');
@@ -435,31 +439,33 @@
                         btnNext.onclick = () => { 
                             if (userRole !== 'admin') return; 
                             triggerVibrate(); saveUndo(); 
+                            const board = document.getElementById(`board-${p}`);
+                            board.classList.remove('turn-flash');
+                            void board.offsetWidth; 
+                            board.classList.add('turn-flash');
+                            setTimeout(() => board.classList.remove('turn-flash'), 1000);
                             state[p].turnCount++; 
-                            state.p1.active = (p === 'p1'); 
-                            state.p2.active = (p === 'p2');
+                            state.p1.active = (p === 'p1'); state.p2.active = (p === 'p2');
                             state[p].runes = Math.min(12, (state[p].runes || 0) + 2);
                             state.p1.energy = 0; state.p1.power = 0; state.p2.energy = 0; state.p2.power = 0;
-                            addLog(`[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); sync(); render(); 
+                            addLog(`°°[${state[p].name}] Turn ${state[p].turnCount} started; runes: ${state[p].runes}`); sync(); render(); 
                         }; 
                     }
                 });
             }
             
             document.getElementById('ui-judge-name').innerText = `JUDGE: ${state.judgeName || '---'}`;
+            document.getElementById('ui-table-num').innerText = state.tableNum || 0;
+            document.getElementById('viewer-hint').style.display = userRole === 'viewer' ? 'block' : 'none';
+
+            if (state.flag) document.body.classList.add('judge-call-active');
+            else document.body.classList.remove('judge-call-active');
 
             ['p1', 'p2'].forEach(p => {
-                const nameEl = document.getElementById(`name-text-${p}`);
-                const turnEl = document.getElementById(`turn-count-${p}`);
-                const boardEl = document.getElementById(`board-${p}`);
-                const dotEl = document.getElementById(`dot-${p}`);
-                
-                if(nameEl) nameEl.innerText = state[p].name;
-                if(turnEl) turnEl.innerText = `Turn ${state[p].turnCount}`;
-                if(boardEl) boardEl.className = `player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden ${state[p].active ? `active-turn-${p}` : ''}`;
-                
-                const hasInf = state[p].infractions && state[p].infractions.length > 0;
-                if(dotEl) dotEl.className = hasInf ? 'inline-block' : 'hidden';
+                document.getElementById(`name-text-${p}`).innerText = state[p].name;
+                document.getElementById(`turn-count-${p}`).innerText = `Turn ${state[p].turnCount}`;
+                document.getElementById(`board-${p}`).className = `player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden ${state[p].active ? `active-turn-${p}` : ''}`;
+                document.getElementById(`dot-${p}`).className = (state[p].infractions?.length > 0) ? 'inline-block' : 'hidden';
 
                 if (editingPlayer === p) {
                     document.getElementById(`name-container-${p}`).classList.add('hidden');
@@ -469,85 +475,81 @@
                     document.getElementById(`name-edit-${p}`).classList.add('hidden');
                 }
                 stats.forEach(s => { 
-                    const valEl = document.getElementById(`val-${p}-${s.id}`);
-                    if(valEl) valEl.innerText = state[p][s.id] || 0;
+                    const key = `${p}-${s.id}`;
+                    document.getElementById(`val-${p}-${s.id}`).innerText = state[p][s.id] || 0;
+                    const card = document.getElementById(`card-${key}`);
+                    if (state.flaggedStats?.[key]) card.classList.add('stat-flagged');
+                    else card.classList.remove('stat-flagged');
                 });
             });
             document.getElementById('btn-flag').className = `w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition ${state.flag ? 'flag-active' : 'bg-slate-700'}`;
+            updateTimerDisplay();
             updateUI();
             document.querySelectorAll('.admin-only').forEach(e => e.style.display = userRole === 'admin' ? '' : 'none');
         };
 
+        window.toggleStatFlag = (key) => {
+            if (userRole !== 'viewer') return; 
+            triggerVibrate();
+            if (!state.flaggedStats) state.flaggedStats = {};
+            if (state.flaggedStats[key]) delete state.flaggedStats[key];
+            else state.flaggedStats[key] = true;
+            sync(); render();
+        };
+
         window.doUpdateStat = (p, s, d, reason) => {
             if (userRole !== 'admin') return;
-            triggerVibrate();
-            saveUndo(); 
+            triggerVibrate(); saveUndo(); 
             const oldVal = state[p][s] || 0; 
             state[p][s] = Math.max(0, oldVal + d); 
             if (oldVal !== state[p][s]) { 
-                let logStr = `[${state[p].name}] ${stats.find(x=>x.id===s).label.replace('🌀 ', '').replace('🖐🏻 ', '').replace('♻️ ', '')}: ${oldVal} -> ${state[p][s]}`;
+                let logStr = `[${state[p].name}] ${stats.find(x=>x.id===s).label.replace(/🌀 |🖐🏻 |♻️ /g, '')}: ${oldVal} -> ${state[p][s]}`;
                 if (reason && d > 0) logStr += ` (${reason})`;
                 addLog(logStr); 
             }
             sync(); render();
         };
 
-        window.startEditName = (p) => { if (userRole !== 'admin') return; triggerVibrate(); editingPlayer = p; document.getElementById(`input-name-${p}`).value = state[p].name; render(); };
+        window.startEditName = (p) => { if (userRole !== 'admin') return; editingPlayer = p; document.getElementById(`input-name-${p}`).value = state[p].name; render(); };
+        window.cancelEditName = () => { editingPlayer = null; render(); };
         window.saveName = (p) => { 
-            triggerVibrate();
             const n = document.getElementById(`input-name-${p}`).value.trim(); 
-            if (n) { saveUndo(); const old = state[p].name; state[p].name = n; addLog(`Renamed: ${old} -> ${n}`); sync(); } 
+            if (n && n !== state[p].name) { 
+                saveUndo(); 
+                state[p].name = n; 
+                sync(); 
+            } 
             editingPlayer = null; render(); 
         };
 
-        const resetInfForm = () => {
-            document.getElementById('inf-type').value = "";
-            document.getElementById('inf-subtype').value = "";
-            document.getElementById('inf-penalty').value = "";
-            document.getElementById('inf-subtype-container').classList.add('hidden');
-            document.getElementById('inf-penalty-container').classList.add('hidden');
-            document.getElementById('btn-add-infraction').disabled = true;
-        };
-
-        window.toggleInfForm = (show) => {
+        document.getElementById('btn-timer-toggle').onclick = () => {
+            if(userRole !== 'admin') return;
             triggerVibrate();
-            const form = document.getElementById('inf-form');
-            const footer = document.getElementById('inf-footer');
-            if(show) { 
-                resetInfForm();
-                form.classList.remove('hidden'); 
-                footer.classList.add('hidden'); 
-            } 
-            else { 
-                form.classList.add('hidden'); 
-                footer.classList.remove('hidden'); 
+            state.timerActive = !state.timerActive;
+            sync(); render();
+        };
+        
+        document.getElementById('btn-timer-set').onclick = () => {
+            if(userRole !== 'admin') return;
+            triggerVibrate();
+            const input = prompt("Enter extra time minutes (e.g. 2):", Math.floor(state.timerSeconds / 60));
+            if (input !== null) {
+                const mins = parseInt(input);
+                if (!isNaN(mins) && mins >= 0) {
+                    saveUndo();
+                    state.timerActive = false; // Stop timer on set
+                    state.timerSeconds = mins * 60;
+                    sync(); render();
+                }
             }
         };
 
-        document.getElementById('inf-type').onchange = (e) => {
-            const type = e.target.value;
-            const subtypeSelect = document.getElementById('inf-subtype');
-            subtypeSelect.innerHTML = '<option value="" disabled selected>Select Subtype</option>';
-            
-            if (infractionData[type]) {
-                infractionData[type].forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s; opt.innerText = s;
-                    subtypeSelect.appendChild(opt);
-                });
-                document.getElementById('inf-subtype-container').classList.remove('hidden');
-            }
-            document.getElementById('inf-penalty-container').classList.add('hidden');
-            document.getElementById('btn-add-infraction').disabled = true;
-        };
-
-        document.getElementById('inf-subtype').onchange = () => {
-            document.getElementById('inf-penalty-container').classList.remove('hidden');
-            document.getElementById('btn-add-infraction').disabled = true;
-        };
-
-        document.getElementById('inf-penalty').onchange = () => {
-            document.getElementById('btn-add-infraction').disabled = false;
+        document.getElementById('btn-timer-reset').onclick = () => {
+            if(userRole !== 'admin') return;
+            triggerVibrate();
+            state.timerSeconds = 0;
+            state.timerActive = false;
+            sync(); render();
         };
 
         window.openInfractions = (p) => {
@@ -560,20 +562,13 @@
         function updateInfList() {
             const list = document.getElementById('inf-list');
             const p = activeInfPlayer;
-            if (!state[p].infractions) state[p].infractions = [];
-            list.innerHTML = state[p].infractions.length 
+            list.innerHTML = state[p].infractions?.length 
                 ? state[p].infractions.map(inf => `<div class="bg-slate-900/40 p-3 rounded-lg border border-slate-700/50 text-[11px] font-bold text-slate-200 uppercase tracking-tight leading-relaxed">${inf}</div>`).join('')
                 : `<div class="text-xs text-slate-500 italic text-center py-8">No infractions recorded.</div>`;
         }
 
         document.getElementById('btn-add-infraction').onclick = () => {
-            if (userRole !== 'admin') return;
-            triggerVibrate();
-            const type = document.getElementById('inf-type').value;
-            const subtype = document.getElementById('inf-subtype').value;
-            const penalty = document.getElementById('inf-penalty').value;
-            const entry = `${type}: ${subtype} | ${penalty}`;
-            
+            const entry = `${document.getElementById('inf-type').value}: ${document.getElementById('inf-subtype').value} | ${document.getElementById('inf-penalty').value}`;
             saveUndo();
             if (!state[activeInfPlayer].infractions) state[activeInfPlayer].infractions = [];
             state[activeInfPlayer].infractions.push(entry);
@@ -584,18 +579,18 @@
         onAuthStateChanged(auth, async u => { if (!u) await signInAnonymously(auth); });
 
         document.getElementById('btn-create-room').onclick = async () => {
-            triggerVibrate();
-            currentRoom = Math.random().toString(36).substring(2, 6).toUpperCase(); userRole = 'admin';
+            currentRoom = Math.random().toString(36).substring(2, 6).toUpperCase(); 
+            userRole = 'admin';
             state.judgeName = document.getElementById('setup-user-name').value.trim() || "Judge";
+            state.tableNum = document.getElementById('setup-table-num').value || 0;
             state.p1.name = document.getElementById('setup-p1-name').value || "Player 1"; 
             state.p2.name = document.getElementById('setup-p2-name').value || "Player 2";
-            addLog(`Match Started - Room: ${currentRoom}`); enterApp(); await sync();
+            addLog(`Match Started - Table ${state.tableNum} - Room: ${currentRoom}`); 
+            enterApp(); await sync();
         };
 
         document.getElementById('btn-join-room').onclick = async () => {
-            triggerVibrate();
             const code = document.getElementById('setup-room-code').value.toUpperCase();
-            if (!code) return;
             const snap = await getDoc(doc(db, 'matches', code));
             if (snap.exists()) { currentRoom = code; userRole = 'viewer'; state = snap.data(); enterApp(); } else alert("Room not found!");
         };
@@ -605,153 +600,102 @@
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('ui-room-code').innerText = currentRoom;
             if (unsubscribeRoom) unsubscribeRoom();
-            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { if (s.exists()) { state = s.data(); render(); } }, (err) => console.error(err));
+            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
+                if (s.exists()) { 
+                    const newData = s.data();
+                    if(newData.timerActive !== state.timerActive || Math.abs(newData.timerSeconds - state.timerSeconds) > 5) {
+                        state.timerSeconds = newData.timerSeconds;
+                        state.timerActive = newData.timerActive;
+                    }
+                    state = newData; 
+                    render(); 
+                } 
+            });
+            startLocalTimer();
             render();
         }
 
+        document.getElementById('btn-flag').onclick = () => { 
+            triggerVibrate(); saveUndo();
+            const roleKey = (userRole === 'admin') ? 'admin' : 'viewer';
+            const logName = (userRole === 'admin') ? 'Judge' : 'Viewer';
+            if (state.flag) {
+                if (state.flagIssuer !== roleKey) return; 
+                state.flag = false; state.flagIssuer = null; addLog(`✅ SOLVED (by ${logName})`);
+            } else {
+                state.flag = true; state.flagIssuer = roleKey; addLog(`🚨 JUDGE CALL (by ${logName})`);
+            }
+            sync(); render(); 
+        };
+
+        document.getElementById('btn-undo').onclick = () => { if (userRole === 'admin' && undoStack.length > 0) { state = JSON.parse(undoStack.pop()); sync(); render(); } };
+        document.getElementById('btn-log').onclick = () => { document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); document.getElementById('modal-log').classList.remove('hidden'); };
+        
+        document.getElementById('btn-copy-log').onclick = async () => {
+            const logString = state.logs.join('\n');
+            const btnText = document.getElementById('copy-btn-text');
+            try {
+                await navigator.clipboard.writeText(logString);
+                btnText.innerText = "COPIED!";
+                setTimeout(() => { btnText.innerText = "Copy"; }, 1000);
+            } catch (err) {
+                console.error('Failed to copy!', err);
+            }
+        };
+
+        document.getElementById('btn-settings').onclick = () => { document.getElementById('modal-settings').classList.remove('hidden'); };
+        document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); });
+        
+        document.getElementById('btn-reset-match').onclick = () => {
+            window.customConfirm("Reset stats and log? Infractions will be kept", async () => { 
+                saveUndo();
+                ['p1', 'p2'].forEach(p => { state[p].points = 0; state[p].xp = 0; state[p].hand = 4; state[p].runes = 0; state[p].energy = 0; state[p].power = 0; state[p].recycled = 0; state[p].active = false; state[p].turnCount = 0; });
+                state.logs = []; state.flag = false; state.flagIssuer = null; state.flaggedStats = {};
+                state.timerSeconds = 0; state.timerActive = false;
+                addLog(`Match Started - Table ${state.tableNum} - Room: ${currentRoom}`);
+                await sync(); render();
+            }, null, { downloadFirst: true });
+        };
+
         window.customConfirm = (msg, onYes, onNo, options = {}) => {
-            triggerVibrate();
             document.getElementById('confirm-msg').innerText = msg;
             const container = document.getElementById('confirm-buttons');
             container.innerHTML = '';
-            
             if (options.downloadFirst) {
-                const btnDl = document.createElement('button');
-                btnDl.className = "w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition mb-2 text-xs uppercase tracking-wider";
-                btnDl.innerText = "Download & Reset";
-                btnDl.onclick = () => { triggerVibrate(); exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
-                container.appendChild(btnDl);
-                
-                const btnOnlyReset = document.createElement('button');
-                btnOnlyReset.className = "w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider";
-                btnOnlyReset.innerText = "Just Reset";
-                btnOnlyReset.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
-                container.appendChild(btnOnlyReset);
-                
-                const btnCancel = document.createElement('button');
-                btnCancel.className = "w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition mt-2 text-xs uppercase tracking-wider";
-                btnCancel.innerText = "Cancel";
-                btnCancel.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onNo) onNo(); };
-                container.appendChild(btnCancel);
+                const b1 = document.createElement('button'); b1.className = "w-full bg-teal-600 p-3 rounded-xl font-bold uppercase text-xs"; b1.innerText = "Download Logs and reset"; b1.onclick = () => { exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b1);
+                const b2 = document.createElement('button'); b2.className = "w-full bg-red-600 p-3 rounded-xl font-bold uppercase text-xs"; b2.innerText = "Just reset"; b2.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b2);
+                const b3 = document.createElement('button'); b3.className = "w-full bg-slate-700 p-3 rounded-xl font-bold uppercase text-xs"; b3.innerText = "Cancel"; b3.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); if(onNo) onNo(); }; container.appendChild(b3);
             } else {
-                const flex = document.createElement('div');
-                flex.className = "flex gap-3 w-full";
-                
-                const btnNo = document.createElement('button');
-                btnNo.className = "flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition";
-                btnNo.innerText = "No";
-                btnNo.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onNo) onNo(); };
-                
-                const btnYes = document.createElement('button');
-                btnYes.className = "flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition";
-                btnYes.innerText = "Yes";
-                btnYes.onclick = () => { triggerVibrate(); document.getElementById('modal-confirm').classList.add('hidden'); if (onYes) onYes(); };
-                
-                flex.appendChild(btnNo); flex.appendChild(btnYes);
-                container.appendChild(flex);
+                const b1 = document.createElement('button'); b1.innerText = "Yes"; b1.className = "bg-red-600 p-3 rounded-xl font-bold flex-1"; b1.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); onYes(); };
+                const b2 = document.createElement('button'); b2.innerText = "No"; b2.className = "bg-slate-700 p-3 rounded-xl font-bold flex-1"; b2.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); if(onNo) onNo(); };
+                const div = document.createElement('div'); div.className="flex gap-2 w-full"; div.appendChild(b2); div.appendChild(b1); container.appendChild(div);
             }
-            
             document.getElementById('modal-confirm').classList.remove('hidden');
         };
 
-        const generateLogString = () => {
-            return `MATCH REPORT - Room: ${currentRoom}\nJudge: ${state.judgeName}\n\nPlayers:\n- ${state.p1.name}\n- ${state.p2.name}\n\nLOG HISTORY:\n${state.logs.join('\n')}`;
-        };
-
-        const exportLog = () => {
-            triggerVibrate();
-            const textContent = generateLogString();
-            const blob = new Blob([textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `RB_MatchLog_${currentRoom}_${state.judgeName}.txt`;
-            document.body.appendChild(a); a.click();
-            document.body.removeChild(a); URL.revokeObjectURL(url);
-        };
-
-        document.getElementById('btn-copy-log').onclick = () => {
-            triggerVibrate();
-            const text = generateLogString();
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                const btn = document.getElementById('btn-copy-log');
-                const originalText = btn.innerHTML;
-                btn.innerText = "Copied!";
-                setTimeout(() => btn.innerHTML = originalText, 2000);
-            } catch (err) {
-                console.error('Copy failed', err);
-            }
-            document.body.removeChild(textarea);
-        };
-
-        document.getElementById('btn-flag').onclick = () => { if (userRole !== 'admin') return; triggerVibrate(); saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ SOLVED"); sync(); render(); };
-        document.getElementById('btn-undo').onclick = () => { triggerVibrate(); if (undoStack.length > 0) { state = JSON.parse(undoStack.pop()); sync(); render(); } };
-        document.getElementById('btn-log').onclick = () => { triggerVibrate(); document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); document.getElementById('modal-log').classList.remove('hidden'); };
-        document.getElementById('btn-settings').onclick = () => { triggerVibrate(); document.getElementById('modal-settings').classList.remove('hidden'); };
-        document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { triggerVibrate(); e.target.closest('.modal-overlay').classList.add('hidden'); });
-
+        const exportLog = () => { const text = `REPORT - Room: ${currentRoom} - Table: ${state.tableNum}\nJudge: ${state.judgeName}\n\nLOG:\n${state.logs.join('\n')}`; const blob = new Blob([text], { type: 'text/plain' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Log_${currentRoom}.txt_${state.judgeName}`; a.click(); };
         document.getElementById('btn-export').onclick = exportLog;
+        document.getElementById('btn-leave-room').onclick = () => { window.customConfirm("Leave current room?", () => { location.reload(); }); };
+
+        const toggleWakeLock = async (enabled) => { if (enabled && 'wakeLock' in navigator) try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} else if (wakeLock) { await wakeLock.release(); wakeLock = null; } };
+        document.getElementById('toggle-wakelock').onchange = (e) => { triggerVibrate(); toggleWakeLock(e.target.checked); };
         
-        document.getElementById('btn-reset-match').onclick = () => {
-            window.customConfirm(
-                "Reset stats and log for a new game?", 
-                async () => { 
-                    saveUndo();
-                    ['p1', 'p2'].forEach(p => {
-                        state[p].points = 0; state[p].xp = 0; state[p].hand = 4; state[p].runes = 0;
-                        state[p].energy = 0; state[p].power = 0; state[p].recycled = 0; state[p].active = false; state[p].turnCount = 0;
-                    });
-                    state.logs = [];
-                    state.flag = false;
-                    await sync(); render();
-                },
-                null,
-                { downloadFirst: true }
-            );
-        };
-
-        document.getElementById('btn-leave-room').onclick = () => {
-            window.customConfirm("Leave current room?", () => { location.reload(); });
-        };
-
-        const toggleWakeLock = async (enabled) => {
-            if (enabled) {
-                try {
-                    if ('wakeLock' in navigator) {
-                        wakeLock = await navigator.wakeLock.request('screen');
-                    }
-                } catch (err) {
-                    console.error(`${err.name}, ${err.message}`);
-                }
-            } else {
-                if (wakeLock) {
-                    await wakeLock.release();
-                    wakeLock = null;
-                }
-            }
-        };
-
-        document.getElementById('toggle-wakelock').onchange = (e) => {
-            triggerVibrate();
-            toggleWakeLock(e.target.checked);
-        };
-
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                wakeLock = await navigator.wakeLock.request('screen');
-            }
+        document.addEventListener('visibilitychange', async () => { 
+            if (wakeLock !== null && document.visibilityState === 'visible') wakeLock = await navigator.wakeLock.request('screen'); 
         });
 
-        window.addEventListener('beforeunload', (e) => {
+        window.onbeforeunload = (e) => {
             if (currentRoom) {
                 e.preventDefault();
-                e.returnValue = 'Data will be lost.';
+                e.returnValue = 'Match in progress. Data might be lost.';
+                return 'Match in progress. Data might be lost.';
             }
-        });
+        };
+        
+        window.toggleInfForm = (show) => { triggerVibrate(); const form = document.getElementById('inf-form'); const footer = document.getElementById('inf-footer'); if(show) { document.getElementById('inf-type').value = ""; form.classList.remove('hidden'); footer.classList.add('hidden'); } else { form.classList.add('hidden'); footer.classList.remove('hidden'); } };
+        document.getElementById('inf-type').onchange = (e) => { const type = e.target.value; const s = document.getElementById('inf-subtype'); s.innerHTML = '<option value="" disabled selected>Select Subtype</option>'; (infractionData[type]||[]).forEach(x=>{ const o=document.createElement('option'); o.value=x; o.innerText=x; s.appendChild(o); }); document.getElementById('inf-subtype-container').classList.remove('hidden'); document.getElementById('inf-penalty-container').classList.add('hidden'); document.getElementById('btn-add-infraction').disabled = true; };
+        document.getElementById('inf-subtype').onchange = () => { document.getElementById('inf-penalty-container').classList.remove('hidden'); };
+        document.getElementById('inf-penalty').onchange = () => { document.getElementById('btn-add-infraction').disabled = false; };
     </script>
 </body>
 </html>
