@@ -195,7 +195,7 @@
                     <div id="inf-list" class="space-y-2"></div>
                 </div>
 
-                <!-- Add New Form (Hidden by default) -->
+                <!-- Add New Form -->
                 <div id="inf-form" class="hidden border-t border-slate-700 pt-6 mt-4 animate-in slide-in-from-bottom-4 duration-300">
                     <div class="space-y-4">
                         <div>
@@ -396,7 +396,6 @@
             sync(); render();
         };
 
-        // Infractions Modal Control
         window.toggleInfForm = (show) => {
             triggerVibrate();
             const form = document.getElementById('inf-form');
@@ -476,27 +475,45 @@
             render();
         }
 
-        document.getElementById('btn-flag').onclick = () => { triggerVibrate(); if (userRole !== 'admin') return; saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ RESOLVED"); sync(); render(); };
+        document.getElementById('btn-flag').onclick = () => { triggerVibrate(); if (userRole !== 'admin') return; saveUndo(); state.flag = !state.flag; addLog(state.flag ? "🚨 JUDGE CALL" : "✅ SOLVED"); sync(); render(); };
         document.getElementById('btn-undo').onclick = () => { triggerVibrate(); if (undoStack.length > 0) { state = JSON.parse(undoStack.pop()); sync(); render(); } };
         document.getElementById('btn-log').onclick = () => { triggerVibrate(); document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); document.getElementById('modal-log').classList.remove('hidden'); };
         document.getElementById('btn-settings').onclick = () => { triggerVibrate(); document.getElementById('modal-settings').classList.remove('hidden'); };
         document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { triggerVibrate(); e.target.closest('.modal-overlay').classList.add('hidden'); });
-        document.getElementById('btn-export').onclick = () => { triggerVibrate(); navigator.clipboard.writeText(state.logs.join('\n')); alert("Logs copied to clipboard!"); };
+        
+        // Export function
+        const exportLogs = () => {
+            const blob = new Blob([state.logs.join('\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MatchLog_${currentRoom}_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        document.getElementById('btn-export').onclick = () => { triggerVibrate(); exportLogs(); };
         
         document.getElementById('btn-reset-match').onclick = async () => { 
             triggerVibrate(); 
-            if (confirm("Reset game stats? Infractions will be KEPT.")) { 
+            // Ask for download before reset
+            if (confirm("Download current Game Logs before resetting stats?")) {
+                exportLogs();
+            }
+
+            if (confirm("Are you sure? This will reset all game stats (Infractions will be KEPT).")) { 
                 saveUndo();
                 const resetData = (p) => {
                     p.points = 0; p.xp = 0; p.hand = 4; p.runes = 0;
                     p.energy = 0; p.power = 0; p.active = false; p.turnCount = 0;
                 };
                 resetData(state.p1); resetData(state.p2);
-                addLog("Match Reset (Stats cleared)"); await sync(); 
+                addLog("Game Reset"); await sync(); 
                 document.getElementById('modal-settings').classList.add('hidden');
             } 
         };
     </script>
 </body>
 </html>
-
