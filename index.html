@@ -363,7 +363,7 @@
         const addLog = (msg) => { 
             const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); 
             state.logs.unshift(`${t} - ${msg}`); 
-            if (state.logs.length > 500) state.logs.pop(); 
+            if (state.logs.length > 800) state.logs.pop(); 
             updateUI();
         };
 
@@ -372,7 +372,7 @@
             if(logEl) logEl.innerText = state.logs[0] || "Ready";
         };
         
-        const saveUndo = () => { undoStack.push(JSON.stringify(state)); if (undoStack.length > 20) undoStack.shift(); };
+        const saveUndo = () => { undoStack.push(JSON.stringify(state)); if (undoStack.length > 30) undoStack.shift(); };
 
         const render = () => {
             const container = document.getElementById('play-area');
@@ -664,7 +664,7 @@
             const blob = new Blob([textContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `RB_MatchLog_${currentRoom}.txt`;
+            a.href = url; a.download = `RB_MatchLog_${currentRoom}_${state.judgeName}.txt`;
             document.body.appendChild(a); a.click();
             document.body.removeChild(a); URL.revokeObjectURL(url);
         };
