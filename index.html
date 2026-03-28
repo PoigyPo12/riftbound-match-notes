@@ -494,14 +494,16 @@
 
         document.getElementById('btn-undo').onclick = () => { 
             if (userRole === 'admin' && undoStack.length > 0) { 
-                state = JSON.parse(undoStack.pop()); 
+                const previousState = JSON.parse(undoStack.pop()); 
+                // Ripristiniamo TUTTO lo stato, inclusi i flag di ownership
+                state = previousState; 
                 sync(); 
                 render(); 
-                if (!document.getElementById('modal-infractions').classList.contains('hidden') && activeInfPlayer) {
-                    updateInfList();
+                if (!document.getElementById('modal-infractions').classList.contains('hidden') && activeInfPlayer) { 
+                    updateInfList(); 
                 }
-                if (!document.getElementById('modal-log').classList.contains('hidden')) {
-                    document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join('');
+                if (!document.getElementById('modal-log').classList.contains('hidden')) { 
+                    document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); 
                 }
             } 
         };
