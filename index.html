@@ -609,6 +609,10 @@
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('ui-room-code').innerText = currentRoom;
+            
+            // Protezione tasto indietro: aggiunge uno stato alla cronologia
+            window.history.pushState({ noBackExits: true }, "");
+        
             if (unsubscribeRoom) unsubscribeRoom();
             unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
                 if (s.exists()) { 
@@ -624,6 +628,20 @@
             startLocalTimer();
             render();
         }
+
+        window.addEventListener('popstate', function(event) {
+            if (currentRoom) {
+                window.customConfirm("Do you want to exit?", 
+                    () => { 
+                        currentRoom = null;
+                        location.reload(); 
+                    }, 
+                    () => { 
+                        window.history.pushState({ noBackExits: true }, "");
+                    }
+                );
+            }
+        });
 
         document.getElementById('btn-flag').onclick = () => { 
             triggerVibrate(); saveUndo();
