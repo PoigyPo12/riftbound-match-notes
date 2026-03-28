@@ -451,16 +451,19 @@
         
             if (unsubscribeRoom) unsubscribeRoom();
             unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
-                if (s.exists()) { 
-                    const newData = s.data();
-                    if(newData.timerActive !== state.timerActive || Math.abs(newData.timerSeconds - state.timerSeconds) > 5) {
-                        state.timerSeconds = newData.timerSeconds;
-                        state.timerActive = newData.timerActive;
-                    }
-                    state = newData; 
-                    render(); 
-                } 
-            });
+    if (s.exists()) { 
+        const newData = s.data();
+        if (userRole === 'admin' && newData.flag !== state.flag) {
+            saveUndo();
+        }
+        if(newData.timerActive !== state.timerActive || Math.abs(newData.timerSeconds - state.timerSeconds) > 5) {
+            state.timerSeconds = newData.timerSeconds;
+            state.timerActive = newData.timerActive;
+        }
+        state = newData; 
+        render(); 
+    } 
+});
             startLocalTimer();
             render();
         }
@@ -494,16 +497,15 @@
 
         document.getElementById('btn-undo').onclick = () => { 
             if (userRole === 'admin' && undoStack.length > 0) { 
-                const previousState = JSON.parse(undoStack.pop()); 
-                // Ripristiniamo TUTTO lo stato, inclusi i flag di ownership
-                state = previousState; 
-                sync(); 
+    
+                const lastState = JSON.parse(undoStack.pop()); 
+                state = lastState; 
+                setDoc(doc(db, 'matches', currentRoom), state);
                 render(); 
-                if (!document.getElementById('modal-infractions').classList.contains('hidden') && activeInfPlayer) { 
-                    updateInfList(); 
-                }
-                if (!document.getElementById('modal-log').classList.contains('hidden')) { 
-                    document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join(''); 
+                
+                if (!document.getElementById('modal-infractions').classList.contains('hidden')) updateInfList();
+                if (!document.getElementById('modal-log').classList.contains('hidden')) {
+                    document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join('');
                 }
             } 
         };
