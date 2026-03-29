@@ -1,5 +1,5 @@
 # RB Match Buddy
-### Overview and online access
+### Overview and Online Access
 
 **Riftbound Match Buddy** is a real-time synchronization tool designed to bridge the communication gap between Table Judges and Backstage Staff (Head Judges, Backstage Judges or Coverage Teams). It provides a shared digital state for resource tracking and rules enforcement, optimized for Feature Match environments.
 
@@ -17,7 +17,7 @@ The system uses a simple **Room Code** architecture to connect devices via Fireb
 
 ---
 
-## 2. Judging Utilities
+## 2. Main features
 
 ### The "My Turn" Logic 
 To ensure the log and resources are accurate, the Judge must trigger the **"My Turn"** button for the player starting their turn (*also for the first turn of each game*). This action performs several automated tasks:
@@ -42,8 +42,14 @@ Every interaction — from a single point change to a "Judge Call" — is record
 * Both the Judge and Viewers share the same, synchronized log list.
 * **Post-Match Report**: The entire log can be exported as a `.txt` file (via the Match History menu or before resetting the game stats via the Settings menu) or copied to clipboard (via the Match History menu only), providing a second-by-second account of the match for late-round discussions or coverage recaps.
 
-### Additional Gamestate Check tool
-* A simple additional tool ("Auditor Tool") is linked in the Settings menu: its purpose is to speed up the calculations you do to reconstruct a previous game state or verify the correctness of the current one (this is simple backtracking that is done mentally in most cases, but in a context of high pressure or accumulated fatigue it can be a viable option, even with the intent of just double-checking).
+### Additional Resources
+   * A simple additional tool ("**Auditor Tool**") is linked in the Settings menu: its purpose is to speed up the calculations you do to reconstruct a previous game state or verify the correctness of the current one (this is simple backtracking that is done mentally in most cases, but in a context of high pressure or accumulated fatigue it can be a viable option, even with the intent of just double-checking).
+   * A link to **Ruinrunner Compendium** is available through the Settings menu: it offers hyperlinked Tournament Rules, Core Rules, a database of card texts, rulings and FAQs.
+
+### Editability of Table number and Judge Name
+* If you made a mistake in inputting one of the above parameters and you're already in the Room, where you see al the stats, you can change:
+   * the **Judge name** through the Settings Menu (simply change the name displayed in the dedicated box and tap on "Save");
+   * the **Table number** by tapping on the orange container ("TBL) right next to the Room Code; edit the number and tap away or tap enter.
 ---
 
 ## 3. Infractions & Penalties 
@@ -65,11 +71,12 @@ To prevent accidental data loss, the tool implements a **History API interceptor
 
 ---
 
-## 5. Technical Notes & License
+## 5. Other Notes & License
 
 * **Undo Engine**: A 30-step deep undo stack allows the Judge to revert any accidental input instantly.
    * The Undo engine also reverts global flags and ownership markers. *If a Viewer triggers an accidental Judge Call*, the Judge (admin) can use Undo to revert the match to a "Pre-Call" state, effectively erasing the accidental alert and its corresponding log entry.*
 * **Wake Lock**: By toggling the dedicated option in the settings menu, it's possible to prevent mobile screens from dimming.
+* **Colorblind Mode**: *Currently WiP*; in the Settings menu a dedicated toggle will switch the colors of some elements to a more colorblind-friendly palette.
 * **License**: **Free to Use**. Provided as a community resource for the Riftbound ecosystem. You are free to host, use, and modify this tool for any local or major competitive event.
 
 ---
