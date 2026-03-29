@@ -33,12 +33,12 @@ The **Points** container is enhanced with specific shortcuts:
 
 ### Judge Call & Ownership 
 The **Judge Call** is a global alert system that triggers a pulsing red overlay on all connected devices.
-* **Closing Ownership**: To maintain a clear chain of command, **the call must be closed by the same role that opened it**. If a Viewer (Backstage) opens a call, they are the only ones who can dismiss the red glow, signaling that the backstage concern has been resolved.
+* **Closing Ownership**: To maintain a clear chain of command, **the call must be closed by the same role that opened it**. If a Viewer (backstage) opens a call, they are the only ones who can dismiss the red glow, signaling that the backstage concern has been resolved.
 
 ### Auditing & Logs
-Every interaction—from a single point change to a "Judge Call"—is recorded in a **Match History**.
-* **Transparency**: Both the Judge and Viewers share the same log.
-* **Post-Match Report**: The entire log can be exported as a `.txt` file, providing a second-by-second account of the match for late-round discussions or coverage recaps.
+Every interaction — from a single point change to a "Judge Call" — is recorded in a **Match History**.
+* Both the Judge and Viewers share the same, synchronized log list.
+* **Post-Match Report**: The entire log can be exported as a `.txt` file (via the Match History menu or before resetting the game stats via the Settings menu) or copied to clipboard (via the Match History menu only), providing a second-by-second account of the match for late-round discussions or coverage recaps.
 ---
 
 ## 3. Infractions & Penalties 
@@ -53,7 +53,7 @@ This ensures that even if a match is reset for a new Game 2 or 3, the Judge main
 
 ### Extra Time Logic
 * **Supplementary Tracking**: This timer tracks ruling time or technical pauses.
-* **PurpleFox Alignment**: This value is **independent**. It should be treated as a "Delta" to be added to the official extra time already recorded in primary tournament software (like PurpleFox).
+* This value is **independent**. It should be treated as a "Delta" to be added to the official extra time already recorded in primary tournament software (like PurpleFox).
 
 ### Navigation Guard
 To prevent accidental data loss, the tool implements a **History API interceptor**. Standard mobile navigation (back-swipes or hardware back buttons) is blocked and redirected to a custom confirmation modal, protecting the active session.
@@ -64,7 +64,7 @@ To prevent accidental data loss, the tool implements a **History API interceptor
 
 * **Undo Engine**: A 30-step deep undo stack allows the Judge to revert any accidental input instantly.
    * The Undo engine also reverts global flags and ownership markers. *If a Viewer triggers an accidental Judge Call*, the Judge (admin) can use Undo to revert the match to a "Pre-Call" state, effectively erasing the accidental alert and its corresponding log entry.*
-* **Wake Lock**: Integrated to prevent mobile screens from dimming during long 40+ minute rounds.
+* **Wake Lock**: By toggling the dedicated option in the settings menu, it's possible to prevent mobile screens from dimming.
 * **License**: **Free to Use**. Provided as a community resource for the Riftbound ecosystem. You are free to host, use, and modify this tool for any local or major competitive event.
 
 ---
