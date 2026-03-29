@@ -33,7 +33,7 @@ The **Points** container is enhanced with specific shortcuts:
 
 ### Judge Call & Ownership 
 The **Judge Call** is a global alert system that triggers a pulsing red overlay on all connected devices.
-* **Closing Ownership**: To maintain a clear chain of command, **the call must be closed by the same role that opened it**. If a Viewer (backstage) opens a call, they are the only ones who can dismiss the red glow, signaling that the backstage concern has been resolved.
+* **Closing Ownership**: To maintain a clear chain of command, **the call must be closed by the same role that opened it**. If a Viewer opens a call, they are the only ones who can dismiss the red glow, signaling that the backstage concern has been resolved (also see §5 "Undo engine").
 
 ### Auditing & Logs
 Every interaction — from a single point change to a "Judge Call" — is recorded in a **Match History**.
@@ -43,8 +43,8 @@ Every interaction — from a single point change to a "Judge Call" — is record
 
 ## 3. Infractions & Penalties 
 
-The tool includes a professional **Penalty Manager** aligned with official standards (GamePlay Errors, Tournament Errors, Unsporting Conduct). Unlike match stats, **resetting the game does NOT clear Infractions**.
-This ensures that even if a match is reset for a new Game 2 or 3, the Judge maintains a persistent record of Warnings or Game Losses assigned during the entire match session.
+The tool includes a simple **Penalty Manager** (shield button near to the player name) aligned with official standards (GamePlay Errors, Tournament Errors, Unsporting Conduct). Unlike match stats, **resetting the game does NOT clear Infractions**.
+This ensures that even if a match is reset for a new Game 2 or 3, the Judge maintains a persistent record of Warnings or Game Losses assigned during the entire match session. It can be useful if the Viewer is the one in charge of updating info for that match in PurpleFox.
 * **Subtype Database**: Includes pre-configured subtypes like *Missed Trigger, Decklist Error, Slowplay, etc.*
 
 ---
