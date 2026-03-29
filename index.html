@@ -11,10 +11,10 @@
     
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="icon/favicon.ico">
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/icon/icon-512.png">
-    <link rel="apple-touch-icon" href="/icon/icon-192.png">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon/icon-512.png">
+    <link rel="apple-touch-icon" href="icon/icon-192.png">
+    <link rel="manifest" href="manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -133,10 +133,51 @@
     <div id="modal-settings" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold">Settings</h3><button class="close-modal p-2">✕</button></div>
-            <div class="p-6 space-y-6">
-                <div class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700"><div><span class="block font-bold text-slate-200">Wake Lock</span><span class="text-[10px] text-slate-500 uppercase font-black">Keep Screen On</span></div><label class="switch"><input type="checkbox" id="toggle-wakelock"><span class="slider"></span></label></div>
-                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-5 rounded-xl font-bold admin-only hover:bg-red-800 transition uppercase tracking-[0.2em] text-sm shadow-lg">Reset Game</button>
-                <div class="border-t border-slate-700 pt-6 space-y-3"><a href="https://poigypo12.github.io/riftbound-auditor/" target="_blank" class="w-full bg-indigo-900/50 border border-indigo-700 hover:bg-indigo-800/80 text-indigo-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2 text-sm uppercase"><span>📊</span> Auditor Tool</a><button id="btn-leave-room" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-3 rounded-xl font-bold transition text-sm uppercase">Leave Room</button></div>
+            <div class="p-5 space-y-5">
+                
+                <div class="flex flex-col bg-slate-900/50 rounded-xl border border-slate-700 overflow-hidden">
+                    
+                    <div class="flex items-center justify-between p-3 border-b border-slate-700/50">
+                        <div>
+                            <span class="block font-bold text-slate-200 text-sm">Wake Lock</span>
+                            <span class="text-[9px] text-slate-500 uppercase font-black">Keep Screen On</span>
+                        </div>
+                        <label class="switch scale-90 origin-right">
+                            <input type="checkbox" id="toggle-wakelock">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 border-b border-slate-700/50">
+                        <div>
+                            <span class="block font-bold text-slate-200 text-sm">Colorblind Mode</span>
+                            <span class="text-[9px] text-slate-500 uppercase font-black">High contrast colors</span>
+                        </div>
+                        <label class="switch scale-90 origin-right">
+                            <input type="checkbox" id="toggle-colorblind">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="admin-only flex items-center justify-between p-3 gap-2">
+                        <div class="shrink-0">
+                            <span class="block font-bold text-slate-200 text-sm">Judge</span>
+                            <span class="text-[9px] text-slate-500 uppercase font-black">Display Name</span>
+                        </div>
+                        <div class="flex gap-2 flex-1 justify-end items-center">
+                            <input type="text" id="input-settings-judge" class="bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-white text-xs w-28 text-center" autocomplete="off">
+                            <button id="btn-save-judge" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-reset-match" class="w-full bg-red-900/50 border border-red-800 text-red-200 py-4 rounded-xl font-bold admin-only hover:bg-red-800 transition uppercase tracking-[0.2em] text-sm shadow-lg">Reset Game</button>
+                
+                <div class="border-t border-slate-700 pt-5 space-y-3">
+                    <a href="https://poigypo12.github.io/riftbound-auditor/" target="_blank" class="w-full bg-indigo-900/50 border border-indigo-700 hover:bg-indigo-800/80 text-indigo-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2 text-sm uppercase"><span>📊</span> Auditor Tool</a>
+                    <a href="https://ruinrunner.altervista.org/" target="_blank" class="w-full bg-emerald-900/50 border border-emerald-700 hover:bg-emerald-800/80 text-emerald-200 py-3 rounded-xl font-bold flex items-center justify-center transition gap-2 text-sm uppercase"><span>📚</span> Ruinrunner Compendium</a>
+                    <button id="btn-leave-room" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-3 rounded-xl font-bold transition text-sm uppercase">Leave Room</button>
+                </div>
             </div>
         </div>
     </div>
@@ -161,6 +202,12 @@
 
         let userRole = 'viewer'; let currentRoom = null; let undoStack = []; let editingPlayer = null; let activeInfPlayer = null;
         let unsubscribeRoom = null; let wakeLock = null; let timerInterval = null;
+        
+        let isEditingTable = false;
+
+        // INIZIALIZZAZIONE COLORBLIND MODE (Locale)
+        const isCbMode = localStorage.getItem('cb-mode') === 'true';
+        if (isCbMode) document.body.classList.add('colorblind-mode');
 
         const infractionData = {
             "GPE": [ "Missed Trigger", "Forgetting to score a point", "Forgetting to draw cards", "Looking at extra cards", "Channeling too many runes", "Channeling too few runes", "Overpayment for cost", "Mispayment for cost", "Looking at secret information", "Looking at opponent private information", "Drawing extra cards", "Nonpublic card error", "Mulligan procedure error", "General error", "Failure to maintain game state" ],
@@ -222,6 +269,17 @@
             }, 1000);
         };
 
+        window.saveTableNum = (val) => {
+            if (val === "" || isNaN(val)) {
+                state.tableNum = 0;
+            } else {
+                state.tableNum = parseInt(val);
+            }
+            sync(); 
+            isEditingTable = false;
+            render();
+        };
+
         const render = () => {
             const container = document.getElementById('play-area');
             if (container.children.length === 0) {
@@ -231,10 +289,10 @@
                             <div>
                                 <div id="name-container-${p}" class="flex items-center gap-2 mb-1">
                                     <h2 class="font-bold text-lg" id="name-text-${p}"></h2>
-                                    <div id="dot-${p}" class="hidden"><span class="infraction-dot"></span></div>
-                                    <div class="flex items-center gap-3 ml-2">
+                                    <div class="flex items-center gap-1.5 ml-1">
                                         <button onclick="startEditName('${p}')" class="admin-only opacity-50 p-1 text-xl leading-none">✎</button>
-                                        <button onclick="openInfractions('${p}')" class="btn-shield text-sm">🛡️</button>
+                                        <button onclick="openInfractions('${p}')" class="btn-shield text-sm shrink-0">🛡️</button>
+                                        <div id="dots-${p}" class="flex gap-1 flex-wrap items-center max-w-[50px]"></div>
                                     </div>
                                 </div>
                                 <div id="name-edit-${p}" class="hidden flex items-center gap-1 mb-1">
@@ -249,9 +307,11 @@
                         <div class="grid grid-cols-2 gap-3 flex-1 relative z-10">
                             ${stats.map(s => {
                                 const key = `${p}-${s.id}`;
+                                const labelClass = s.id === 'energy' ? 'text-energy-label' : (s.id === 'power' ? 'text-power-label' : 'text-slate-400');
+                                
                                 if (s.id === 'points') {
                                     return `<div id="card-${key}" class="stat-card" onclick="window.toggleStatFlag('${key}')">
-                                        <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
+                                        <span class="text-[11px] uppercase font-bold mb-2 ${labelClass}">${s.label}</span>
                                         <div class="flex items-center justify-around w-full gap-0.5">
                                             <div class="admin-only flex items-center shrink">
                                                 <button class="btn-stat shrink !min-w-[1.7rem] !max-w-[2.4rem] w-full !h-[2.8rem] !text-lg transition-all" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
@@ -268,7 +328,7 @@
                                     </div>`;
                                 }
                                 return `<div id="card-${key}" class="stat-card ${s.id === 'recycled' ? 'col-span-2' : ''}" onclick="window.toggleStatFlag('${key}')">
-                                    <span class="text-[10px] uppercase font-bold mb-2 text-slate-400">${s.label}</span>
+                                    <span class="text-[11px] uppercase font-bold mb-2 ${labelClass}">${s.label}</span>
                                     <div class="flex items-center justify-between w-full px-1">
                                         <button class="btn-stat admin-only" onclick="event.stopPropagation(); window.doUpdateStat('${p}', '${s.id}', -1)">-</button>
                                         <span class="text-2xl font-black font-mono text-center flex-1" id="val-${p}-${s.id}">0</span>
@@ -301,7 +361,35 @@
             }
             
             document.getElementById('ui-judge-name').innerText = `JUDGE: ${state.judgeName || '---'}`;
-            document.getElementById('ui-table-num').innerText = state.tableNum || 0;
+            
+            const tblBadge = document.getElementById('ui-table-num');
+            if (isEditingTable && userRole === 'admin') {
+                const initLen = state.tableNum ? String(state.tableNum).length : 1;
+                tblBadge.innerHTML = `<input type="number" id="input-tbl-inline" class="input-tbl-inline" value="${state.tableNum}" inputmode="numeric" style="width: ${initLen + 0.5}ch;">`;
+                const inp = document.getElementById('input-tbl-inline');
+                
+                inp.oninput = function() {
+                    const len = this.value ? this.value.length : 1;
+                    this.style.width = (len + 0.5) + 'ch';
+                };
+                
+                setTimeout(() => { inp.focus(); inp.select(); }, 50);
+                
+                inp.onclick = (e) => e.stopPropagation();
+                inp.onblur = (e) => saveTableNum(e.target.value);
+                inp.onkeydown = (e) => { if(e.key === 'Enter') saveTableNum(e.target.value); };
+                
+                tblBadge.onclick = null;
+            } else {
+                tblBadge.innerText = state.tableNum || 0;
+                tblBadge.onclick = () => {
+                    if (userRole === 'admin') {
+                        isEditingTable = true;
+                        render();
+                    }
+                };
+            }
+
             document.getElementById('viewer-hint').style.display = userRole === 'viewer' ? 'block' : 'none';
 
             if (state.flag) document.body.classList.add('judge-call-active');
@@ -311,7 +399,9 @@
                 document.getElementById(`name-text-${p}`).innerText = state[p].name;
                 document.getElementById(`turn-count-${p}`).innerText = `Turn ${state[p].turnCount}`;
                 document.getElementById(`board-${p}`).className = `player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden ${state[p].active ? `active-turn-${p}` : ''}`;
-                document.getElementById(`dot-${p}`).className = (state[p].infractions?.length > 0) ? 'inline-block' : 'hidden';
+                
+                const infCount = state[p].infractions ? state[p].infractions.length : 0;
+                document.getElementById(`dots-${p}`).innerHTML = Array(infCount).fill('<span class="infraction-dot"></span>').join('');
 
                 if (editingPlayer === p) {
                     document.getElementById(`name-container-${p}`).classList.add('hidden');
@@ -446,24 +536,23 @@
             document.getElementById('app-screen').classList.remove('hidden');
             document.getElementById('ui-room-code').innerText = currentRoom;
             
-            // Protezione tasto indietro: aggiunge uno stato alla cronologia
             window.history.pushState({ noBackExits: true }, "");
         
             if (unsubscribeRoom) unsubscribeRoom();
             unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
-    if (s.exists()) { 
-        const newData = s.data();
-        if (userRole === 'admin' && newData.flag !== state.flag) {
-            saveUndo();
-        }
-        if(newData.timerActive !== state.timerActive || Math.abs(newData.timerSeconds - state.timerSeconds) > 5) {
-            state.timerSeconds = newData.timerSeconds;
-            state.timerActive = newData.timerActive;
-        }
-        state = newData; 
-        render(); 
-    } 
-});
+                if (s.exists()) { 
+                    const newData = s.data();
+                    if (userRole === 'admin' && newData.flag !== state.flag) {
+                        saveUndo();
+                    }
+                    if(newData.timerActive !== state.timerActive || Math.abs(newData.timerSeconds - state.timerSeconds) > 5) {
+                        state.timerSeconds = newData.timerSeconds;
+                        state.timerActive = newData.timerActive;
+                    }
+                    state = newData; 
+                    render(); 
+                } 
+            });
             startLocalTimer();
             render();
         }
@@ -497,13 +586,12 @@
 
         document.getElementById('btn-undo').onclick = () => { 
             if (userRole === 'admin' && undoStack.length > 0) { 
-    
-                const lastState = JSON.parse(undoStack.pop()); 
-                state = lastState; 
-                setDoc(doc(db, 'matches', currentRoom), state);
+                state = JSON.parse(undoStack.pop()); 
+                sync(); 
                 render(); 
-                
-                if (!document.getElementById('modal-infractions').classList.contains('hidden')) updateInfList();
+                if (!document.getElementById('modal-infractions').classList.contains('hidden') && activeInfPlayer) {
+                    updateInfList();
+                }
                 if (!document.getElementById('modal-log').classList.contains('hidden')) {
                     document.getElementById('log-container').innerHTML = state.logs.map(l => `<div class="border-b border-slate-700/50 pb-1">${l}</div>`).join('');
                 }
@@ -522,9 +610,42 @@
             } catch (err) { console.error('Failed to copy!', err); }
         };
 
-        document.getElementById('btn-settings').onclick = () => { document.getElementById('modal-settings').classList.remove('hidden'); };
+        document.getElementById('btn-settings').onclick = () => { 
+            document.getElementById('input-settings-judge').value = state.judgeName || "";
+            document.getElementById('toggle-colorblind').checked = document.body.classList.contains('colorblind-mode');
+            document.getElementById('modal-settings').classList.remove('hidden'); 
+        };
+        
         document.querySelectorAll('.close-modal').forEach(b => b.onclick = (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); });
         
+        // GESTIONE COLORBLIND TOGGLE
+        document.getElementById('toggle-colorblind').onchange = (e) => {
+            triggerVibrate();
+            if(e.target.checked) {
+                document.body.classList.add('colorblind-mode');
+                localStorage.setItem('cb-mode', 'true');
+            } else {
+                document.body.classList.remove('colorblind-mode');
+                localStorage.setItem('cb-mode', 'false');
+            }
+        };
+
+        document.getElementById('btn-save-judge').onclick = () => {
+            if(userRole !== 'admin') return;
+            const newName = document.getElementById('input-settings-judge').value.trim();
+            if(newName && newName !== state.judgeName) {
+                saveUndo();
+                const oldName = state.judgeName;
+                state.judgeName = newName;
+                addLog(`Judge changed from ${oldName} to ${newName}`);
+                sync();
+                render();
+                const btn = document.getElementById('btn-save-judge');
+                btn.innerText = "Saved!";
+                setTimeout(() => btn.innerText = "Save", 1000);
+            }
+        };
+
         document.getElementById('btn-reset-match').onclick = () => {
             window.customConfirm("Reset stats and logs? Infractions will be kept", async () => { 
                 saveUndo();
@@ -575,6 +696,7 @@
             const footer = document.getElementById('inf-footer'); 
             if(show) { 
                 document.getElementById('inf-type').value = ""; 
+                document.getElementById('inf-penalty').value = "";
                 document.getElementById('inf-subtype-container').classList.add('hidden');
                 document.getElementById('inf-penalty-container').classList.add('hidden');
                 document.getElementById('btn-add-infraction').disabled = true;
@@ -588,6 +710,12 @@
         document.getElementById('inf-type').onchange = (e) => { const type = e.target.value; const s = document.getElementById('inf-subtype'); s.innerHTML = '<option value="" disabled selected>Select Subtype</option>'; (infractionData[type]||[]).forEach(x=>{ const o=document.createElement('option'); o.value=x; o.innerText=x; s.appendChild(o); }); document.getElementById('inf-subtype-container').classList.remove('hidden'); document.getElementById('inf-penalty-container').classList.add('hidden'); document.getElementById('btn-add-infraction').disabled = true; };
         document.getElementById('inf-subtype').onchange = () => { document.getElementById('inf-penalty-container').classList.remove('hidden'); };
         document.getElementById('inf-penalty').onchange = () => { document.getElementById('btn-add-infraction').disabled = false; };
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
     </script>
 </body>
 </html>
