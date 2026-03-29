@@ -1,23 +1,25 @@
 # RB Match Buddy
-### Overview
+### Overview and online access
 
 **Riftbound Match Buddy** is a real-time synchronization tool designed to bridge the communication gap between Table Judges and Backstage Staff (Head Judges, Backstage Judges or Coverage Teams). It provides a shared digital state for resource tracking and rules enforcement, optimized for Feature Match environments.
+
+It can be **accessed** through https://poigypo12.github.io/riftbound-match-notes/
 
 ---
 
 ## 1. Operational Roles & Control Logic
 
-The system uses a **Room Code** architecture to connect devices via Firebase with two distinct permission levels:
+The system uses a simple **Room Code** architecture to connect devices via Firebase with two distinct permission levels:
 
-* **Judge (Admin)**: The official at the table. Has full authority to modify stats, manage timers, and log penalties.
-* **Viewer (Backstage/HJ)**: Provides a real-time, read-only mirror of the match.
-    * **Stat Flagging**: Viewers can tap any resource card to "flag" it (turning it red on the Judge's screen). This allows backstage officials to discreetly signal a potential error (e.g., a missed draw or incorrect energy count) without verbal interruption.
+* **Judge (Admin)**: The official at the table. Has full authority to modify stats, manage the timer, and log penalties.
+* **Viewer (Backstage)**: Provides a real-time, mainly read-only mirror of the match, with limited, focused interaction (e.g.: *Stat Flagging* & *Judge Call*)
+    * **Stat Flagging**: Viewers can tap any resource card to "flag" it (turning it red on the Judge's screen). This allows backstage officials to discreetly signal a potential error (such as a missed draw or incorrect rune count) without verbal interruption.
 
 ---
 
 ## 2. Judging Utilities
 
-### The "My Turn" Logic & Automation
+### The "My Turn" Logic 
 To ensure the log and resources are accurate, the Judge must trigger the **"My Turn"** button for the player starting their turn (*also for the first turn of each game*). This action performs several automated tasks:
 * **Resource Reset**: Clears the current *Energy* and *Power* for both players; they are indicators for resources stored in the *Rune Pool*.
 * **Rune Channeling**: Automatically adds **2 Runes** to the active player (capped at 12).
@@ -35,10 +37,13 @@ The **Points** container is enhanced with specific shortcuts:
 The **Judge Call** is a global alert system that triggers a pulsing red overlay on all connected devices.
 * **Closing Ownership**: To maintain a clear chain of command, **the call must be closed by the same role that opened it**. If a Viewer opens a call, they are the only ones who can dismiss the red glow, signaling that the backstage concern has been resolved (also see §5 "Undo engine").
 
-### Auditing & Logs
+### Logs
 Every interaction — from a single point change to a "Judge Call" — is recorded in a **Match History**.
 * Both the Judge and Viewers share the same, synchronized log list.
 * **Post-Match Report**: The entire log can be exported as a `.txt` file (via the Match History menu or before resetting the game stats via the Settings menu) or copied to clipboard (via the Match History menu only), providing a second-by-second account of the match for late-round discussions or coverage recaps.
+
+### Additional Gamestate Check tool
+* A simple additional tool ("Auditor Tool") is linked in the Settings menu: its purpose is to speed up the calculations you do to reconstruct a previous game state or verify the correctness of the current one (this is simple backtracking that is done mentally in most cases, but in a context of high pressure or accumulated fatigue it can be a viable option, even with the intent of just double-checking).
 ---
 
 ## 3. Infractions & Penalties 
@@ -49,11 +54,11 @@ This ensures that even if a match is reset for a new Game 2 or 3, the Judge main
 
 ---
 
-## 4. Time Management & Safety
+## 4. Time Management & "Safety"
 
-### Extra Time Logic
+### Extra Time
 * **Supplementary Tracking**: This timer tracks ruling time or technical pauses.
-* This value is **independent**. It should be treated as a "Delta" to be added to the official extra time already recorded in primary tournament software (like PurpleFox).
+* This value is **independent**. It should be treated as a "delta" to be added to the official extra time already recorded in primary tournament software (like PurpleFox).
 
 ### Navigation Guard
 To prevent accidental data loss, the tool implements a **History API interceptor**. Standard mobile navigation (back-swipes or hardware back buttons) is blocked and redirected to a custom confirmation modal, protecting the active session.
@@ -69,5 +74,5 @@ To prevent accidental data loss, the tool implements a **History API interceptor
 
 ---
 
-**Author**: [Atled]  
+**Author**: Atled  
 **Architecture**: Firebase Real-time Firestore.
