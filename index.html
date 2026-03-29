@@ -27,12 +27,12 @@
             <h1 class="text-3xl font-bold text-center mb-8 text-teal-400">RB Match Buddy</h1>
             <div class="space-y-5">
                 <div class="grid grid-cols-3 gap-2">
-                    <input type="text" id="setup-user-name" class="col-span-2 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Judge Name">
-                    <input type="number" id="setup-table-num" class="col-span-1 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Table">
+                    <input type="text" id="setup-user-name" autocomplete="off" class="col-span-2 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Judge Name">
+                    <input type="number" id="setup-table-num" autocomplete="off" class="col-span-1 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Table">
                 </div>
                 <div class="space-y-3">
-                    <input type="text" id="setup-p1-name" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Player 1">
-                    <input type="text" id="setup-p2-name" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Player 2">
+                    <input type="text" id="setup-p1-name" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Player 1">
+                    <input type="text" id="setup-p2-name" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white" placeholder="Player 2">
                     <button id="btn-create-room" class="w-full bg-teal-600 text-white font-bold py-3 rounded-lg active:scale-95 transition">Create Match</button>
                 </div>
                 <div class="relative py-2 text-center text-xs text-slate-500 uppercase">or</div>
@@ -238,7 +238,7 @@
                                     </div>
                                 </div>
                                 <div id="name-edit-${p}" class="hidden flex items-center gap-1 mb-1">
-                                    <input type="text" id="input-name-${p}" class="edit-input text-sm">
+                                    <input type="text" id="input-name-${p}" autocomplete="off" class="edit-input text-sm">
                                     <button onclick="saveName('${p}')" class="text-teal-400 font-bold px-1 text-lg">✓</button>
                                     <button onclick="cancelEditName()" class="text-red-400 font-bold px-1 ml-1 text-lg">X</button>
                                 </div>
