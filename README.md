@@ -1,7 +1,7 @@
 # RB Match Buddy
 ### Overview
 
-**Riftbound Match Buddy** is a real-time synchronization tool designed to bridge the communication gap between Table Judges and Backstage Staff (Head Judges or Coverage Teams). It provides a shared digital state for resource tracking and rules enforcement, optimized for Feature Match environments.
+**Riftbound Match Buddy** is a real-time synchronization tool designed to bridge the communication gap between Table Judges and Backstage Staff (Head Judges, Backstage Judges or Coverage Teams). It provides a shared digital state for resource tracking and rules enforcement, optimized for Feature Match environments.
 
 ---
 
