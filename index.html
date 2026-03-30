@@ -662,7 +662,7 @@
             const container = document.getElementById('confirm-buttons');
             container.innerHTML = '';
             if (options.downloadFirst) {
-                const b1 = document.createElement('button'); b1.className = "w-full bg-teal-600 p-3 rounded-xl font-bold uppercase text-xs"; b1.innerText = "Download log and exit"; b1.onclick = () => { exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b1);
+                const b1 = document.createElement('button'); b1.className = "w-full bg-teal-600 p-3 rounded-xl font-bold uppercase text-xs"; b1.innerText = "Download log and Reset"; b1.onclick = () => { exportLog(); document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b1);
                 const b2 = document.createElement('button'); b2.className = "w-full bg-red-600 p-3 rounded-xl font-bold uppercase text-xs"; b2.innerText = "Just reset"; b2.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); onYes(); }; container.appendChild(b2);
                 const b3 = document.createElement('button'); b3.className = "w-full bg-slate-700 p-3 rounded-xl font-bold uppercase text-xs"; b3.innerText = "Cancel"; b3.onclick = () => { document.getElementById('modal-confirm').classList.add('hidden'); if(onNo) onNo(); }; container.appendChild(b3);
             } else {
