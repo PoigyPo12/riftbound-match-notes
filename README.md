@@ -12,7 +12,7 @@ It can be **accessed** through https://poigypo12.github.io/riftbound-match-notes
 The system uses a simple **Room Code** architecture to connect devices via Firebase with two distinct permission levels:
 
 * **Judge (Admin)**: The official at the table. Has full authority to modify stats, manage the timer, and log penalties.
-* **Viewer (Backstage)**: Provides a real-time, mainly read-only mirror of the match, with limited, focused interaction (e.g.: *Stat Flagging* & *Judge Call*)
+* **Viewer (Backstage)**: Provides a real-time, mainly read-only mirror of the match, with limited, focused interaction (e.g.: *Stat Flagging* & *Judge Call*; also see §2.Judge Call & Ownership)
     * **Stat Flagging**: Viewers can tap any resource card to "flag" it (turning it red on the Judge's screen). This allows backstage officials to discreetly signal a potential error (such as a missed draw or incorrect rune count) without verbal interruption.
 
 ---
@@ -47,9 +47,9 @@ Every interaction — from a single point change to a "Judge Call" — is record
    * A link to **Ruinrunner Compendium** is available through the Settings menu: it offers hyperlinked Tournament Rules, Core Rules, a database of card texts, rulings and FAQs.
 
 ### Editability of Table number and Judge Name
-* If you made a mistake in inputting one of the above parameters and you're already in the Room, where you see al the stats, you can change:
+* If you made a mistake in inputting one of the above parameters and you're already in the Room, where you see all the stats, you can change:
    * the **Judge name** through the Settings Menu (simply change the name displayed in the dedicated box and tap on "Save");
-   * the **Table number** by tapping on the orange container ("TBL) right next to the Room Code; edit the number and tap away or tap enter.
+   * the **Table number** by tapping on the orange container ("TBL") right next to the Room Code; edit the number and tap away or tap enter.
 ---
 
 ## 3. Infractions & Penalties 
