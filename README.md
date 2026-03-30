@@ -12,7 +12,7 @@ It can be **accessed** through https://poigypo12.github.io/riftbound-match-notes
 The system uses a simple **Room Code** architecture to connect devices via Firebase with two distinct permission levels:
 
 * **Judge (Admin)**: The official at the table. Has full authority to modify stats, manage the timer, and log penalties.
-* **Viewer (Backstage)**: Provides a real-time, mainly read-only mirror of the match, with limited, focused interaction (e.g.: *Stat Flagging* & *Judge Call*; also see §2.Judge Call & Ownership)
+* **Viewer (Backstage)**: Provides a real-time, mainly read-only mirror of the match, with limited, focused interaction (e.g.: *Stat Flagging* & *Judge Call*; also see [§2.Judge Call & Ownership](#judge-call-and-ownership))
     * **Stat Flagging**: Viewers can tap any resource card to "flag" it (turning it red on the Judge's screen). This allows backstage officials to discreetly signal a potential error (such as a missed draw or incorrect rune count) without verbal interruption.
 
 ---
@@ -33,9 +33,9 @@ The **Points** container is enhanced with specific shortcuts:
 * **Hold (+H)**: Specifically for points gained through *Hold*.
 * *Note: All scoring types are explicitly labeled in the match history log for post-match audit.*
 
-### Judge Call & Ownership 
+### Judge Call and Ownership 
 The **Judge Call** is a global alert system that triggers a pulsing red overlay on all connected devices.
-* **Closing Ownership**: To maintain a clear chain of command, **the call must be closed by the same role that opened it**. If a Viewer opens a call, they are the only ones who can dismiss the red glow, signaling that the backstage concern has been resolved (also see §5 "Undo engine").
+* **Closing Ownership**: To maintain a clear chain of command, **the call must be closed by the same role that opened it**. If a Viewer opens a call, they are the only ones who can dismiss the red glow, signaling that the backstage concern has been resolved (also see ["Undo engine" in §5](#5-other-notes-and-license)).
 
 ### Logs
 Every interaction — from a single point change to a "Judge Call" — is recorded in a **Match History**.
@@ -52,7 +52,7 @@ Every interaction — from a single point change to a "Judge Call" — is record
    * the **Table number** by tapping on the orange container ("TBL") right next to the Room Code; edit the number and tap away or tap enter.
 ---
 
-## 3. Infractions & Penalties 
+## 3. Infractions and Penalties 
 
 The tool includes a simple **Penalty Manager** (shield button near to the player name) aligned with official standards (GamePlay Errors, Tournament Errors, Unsporting Conduct). Unlike match stats, **resetting the game does NOT clear Infractions**.
 This ensures that even if a match is reset for a new Game 2 or 3, the Judge maintains a persistent record of Warnings or Game Losses assigned during the entire match session. It can be useful if the Viewer is the one in charge of updating info for that match in PurpleFox.
@@ -60,7 +60,7 @@ This ensures that even if a match is reset for a new Game 2 or 3, the Judge main
 
 ---
 
-## 4. Time Management & "Safety"
+## 4. Time Management and "Safety"
 
 ### Extra Time
 * **Supplementary Tracking**: This timer tracks ruling time or technical pauses.
@@ -71,7 +71,7 @@ To prevent accidental data loss, the tool implements a **History API interceptor
 
 ---
 
-## 5. Other Notes & License
+## 5. Other Notes and License
 
 * **Undo Engine**: A 30-step deep undo stack allows the Judge to revert any accidental input instantly.
    * The Undo engine also reverts global flags and ownership markers. *If a Viewer triggers an accidental Judge Call*, the Judge (admin) can use Undo to revert the match to a "Pre-Call" state, effectively erasing the accidental alert and its corresponding log entry.*
