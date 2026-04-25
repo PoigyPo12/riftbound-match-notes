@@ -54,9 +54,10 @@ Every interaction — from a single point change to a "Judge Call" — is record
 
 ## 3. Infractions and Penalties 
 
-The tool includes a simple **Penalty Manager** (shield button near to the player name) aligned with official standards (GamePlay Errors, Tournament Errors, Unsporting Conduct). Unlike match stats, **resetting the game does NOT clear Infractions**.
+The tool includes a simple **Penalty Manager** (shield button near to the player name) aligned with official standards (GamePlay Errors - GPE, Tournament Errors - TE, Unsporting Conduct - UC). Unlike match stats, **resetting the game does NOT clear Infractions**.
 This ensures that even if a match is reset for a new Game 2 or 3, the Judge maintains a persistent record of Warnings or Game Losses assigned during the entire match session. It can be useful if the Viewer is the one in charge of updating info for that match in PurpleFox.
 * **Subtype Database**: Includes pre-configured subtypes like *Missed Trigger, Decklist Error, Slowplay, etc.*
+* **Infraction icons**: Each infraction class (GPE, TE, UC) has a an *icon each with a different shape* assigned; when a new penalty is issued to a player, one unit of the corresponding shape will appear in the line of that player's name. They stack horizontally.
 
 ---
 
