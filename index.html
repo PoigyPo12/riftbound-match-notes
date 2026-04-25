@@ -400,8 +400,21 @@
                 document.getElementById(`turn-count-${p}`).innerText = `Turn ${state[p].turnCount}`;
                 document.getElementById(`board-${p}`).className = `player-board theme-${p} border-2 rounded-2xl p-4 flex flex-col transition-all shadow-lg relative overflow-hidden ${state[p].active ? `active-turn-${p}` : ''}`;
                 
-                const infCount = state[p].infractions ? state[p].infractions.length : 0;
-                document.getElementById(`dots-${p}`).innerHTML = Array(infCount).fill('<span class="infraction-dot"></span>').join('');
+                let infHTML = '';
+                if (state[p].infractions) {
+                    state[p].infractions.forEach(inf => {
+                        if (inf.startsWith('GPE')) {
+                            infHTML += '<span class="infraction-dot"></span>';
+                        } else if (inf.startsWith('TE')) {
+                            infHTML += '<span class="infraction-square"></span>';
+                        } else if (inf.startsWith('UC')) {
+                            infHTML += '<span class="infraction-triangle"></span>';
+                        } else {
+                            infHTML += '<span class="infraction-dot"></span>'; // Fallback di sicurezza
+                        }
+                    });
+                }
+                document.getElementById(`dots-${p}`).innerHTML = infHTML;
 
                 if (editingPlayer === p) {
                     document.getElementById(`name-container-${p}`).classList.add('hidden');
