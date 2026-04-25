@@ -123,6 +123,25 @@ body {
     box-shadow: 0 0 4px #ef4444;
 }
 
+.infraction-square {
+    width: 6px;
+    height: 6px;
+    background-color: #eab308; /* Giallo */
+    display: inline-block;
+    box-shadow: 0 0 4px #eab308;
+}
+
+.infraction-triangle {
+    width: 0;
+    height: 0;
+    border-left: 3.5px solid transparent;
+    border-right: 3.5px solid transparent;
+    border-bottom: 6px solid #f8fafc; /* Bianco */
+    display: inline-block;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6));
+    transform: translateY(-1px);
+}
+
 .btn-shield {
     background-color: rgba(51, 65, 85, 0.5);
     border: 1px solid rgba(148, 163, 184, 0.3);
@@ -200,6 +219,7 @@ body.colorblind-mode .text-red-200 { color: #fdf4ff !important; }
 body.colorblind-mode .hover\:bg-red-800:hover { background-color: rgba(192, 38, 211, 0.5) !important; }
 
 body.colorblind-mode .infraction-dot { background-color: #d946ef !important; box-shadow: 0 0 4px #d946ef !important; }
+body.colorblind-mode .infraction-square { background-color: #0ea5e9 !important; box-shadow: 0 0 4px #0ea5e9 !important; }
 
 body.colorblind-mode .judge-call-active::after {
     background-color: rgba(217, 70, 239, 0.3) !important;
