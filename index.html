@@ -53,7 +53,10 @@
                     <span class="text-[8px] uppercase text-slate-400 font-bold tracking-wider ml-0.5">Tbl</span>
                     <span id="ui-table-num" class="text-base font-mono font-black text-amber-400 tracking-wider bg-amber-900/40 px-1.5 py-0.5 rounded border border-amber-700/50">0</span>
                 </div>
-                <span id="ui-judge-name" class="text-[9px] text-slate-500 font-medium truncate mt-0.5 uppercase tracking-wide">JUDGE: ---</span>
+                <span id="ui-judge-name" class="text-[9px] text-slate-500 font-medium truncate mt-0.5 uppercase tracking-wide flex items-center gap-1">
+                    <span id="status-dot" class="w-1.5 h-1.5 rounded-full bg-red-500 transition-colors duration-300"></span>
+                    JUDGE: ---
+                </span>
             </div>
             <div class="flex gap-2 shrink-0">
                 <button id="btn-flag" title="Judge Call" class="bg-slate-700 w-11 h-11 rounded-xl flex items-center justify-center active:scale-90 transition">
@@ -220,8 +223,15 @@
             p1: { name: "Player 1", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, recycled: 0, active: false, turnCount: 0, infractions: [] }, 
             p2: { name: "Player 2", points: 0, xp: 0, hand: 4, runes: 0, energy: 0, power: 0, recycled: 0, active: false, turnCount: 0, infractions: [] }, 
             flag: false, flagIssuer: null, flaggedStats: {}, logs: [],
-            timerSeconds: 0, timerActive: false
+            timerSeconds: 0, timerActive: false, timerStartedAt: null
         };
+
+        const getElapsedSeconds = () => {
+            if (!state.timerActive || !state.timerStartedAt) return state.timerSeconds || 0;
+            const elapsedSinceStart = Math.floor((Date.now() - state.timerStartedAt) / 1000);
+            return Math.max(0, (state.timerSeconds || 0) + elapsedSinceStart);
+        };
+
         let state = JSON.parse(JSON.stringify(defaultState));
         const stats = [
             { id: 'points', label: 'Points' }, { id: 'xp', label: 'XP' }, 
@@ -229,6 +239,15 @@
             { id: 'energy', label: 'Energy' }, { id: 'power', label: 'Power' },
             { id: 'recycled', label: '♻️ Recycled' }
         ];
+
+        const setStatus = (isOnline) => {
+            const dot = document.getElementById('status-dot');
+            if (dot) {
+                dot.className = `w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isOnline ? 'bg-green-500' : 'bg-red-500'}`;
+            }
+        };
+        window.addEventListener('online', () => setStatus(true));
+        window.addEventListener('offline', () => setStatus(false));
 
         const triggerVibrate = () => { if (navigator.vibrate) navigator.vibrate(10); };
         const sync = async () => { if (!currentRoom) return; await setDoc(doc(db, 'matches', currentRoom), state); };
@@ -253,7 +272,8 @@
         };
 
         const updateTimerDisplay = () => {
-            document.getElementById('timer-val').innerText = formatTime(state.timerSeconds || 0);
+            const currentSeconds = getElapsedSeconds();
+            document.getElementById('timer-val').innerText = formatTime(currentSeconds);
             const btn = document.getElementById('btn-timer-toggle');
             if(btn) btn.innerText = state.timerActive ? 'Pause' : 'Start';
         };
@@ -261,11 +281,7 @@
         const startLocalTimer = () => {
             if(timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
-                if(state.timerActive) {
-                    state.timerSeconds++;
-                    updateTimerDisplay();
-                    if(userRole === 'admin' && state.timerSeconds % 5 === 0) sync(); 
-                }
+                updateTimerDisplay();
             }, 1000);
         };
 
@@ -360,7 +376,7 @@
                 });
             }
             
-            document.getElementById('ui-judge-name').innerText = `JUDGE: ${state.judgeName || '---'}`;
+            document.getElementById('ui-judge-name').innerHTML = `<span id="status-dot" class="w-1.5 h-1.5 rounded-full transition-colors duration-300 ${navigator.onLine ? 'bg-green-500' : 'bg-red-500'}"></span> JUDGE: ${state.judgeName || '---'}`;
             
             const tblBadge = document.getElementById('ui-table-num');
             if (isEditingTable && userRole === 'admin') {
@@ -474,20 +490,31 @@
         document.getElementById('btn-timer-toggle').onclick = () => {
             if(userRole !== 'admin') return;
             triggerVibrate();
-            state.timerActive = !state.timerActive;
+            
+            if (!state.timerActive) {
+                state.timerActive = true;
+                state.timerStartedAt = Date.now();
+            } else {
+                state.timerSeconds = getElapsedSeconds();
+                state.timerActive = false;
+                state.timerStartedAt = null;
+            }
+            
             sync(); render();
         };
         
         document.getElementById('btn-timer-set').onclick = () => {
             if(userRole !== 'admin') return;
             triggerVibrate();
-            const input = prompt("Enter extra time minutes (e.g. 2):", Math.floor(state.timerSeconds / 60));
+            const currentMins = Math.floor(getElapsedSeconds() / 60);
+            const input = prompt("Enter extra time minutes:", currentMins);
             if (input !== null) {
                 const mins = parseInt(input);
                 if (!isNaN(mins) && mins >= 0) {
                     saveUndo();
-                    state.timerActive = false;
                     state.timerSeconds = mins * 60;
+                    // Se il timer era attivo, resettiamo il punto di partenza a "ora"
+                    if (state.timerActive) state.timerStartedAt = Date.now();
                     sync(); render();
                 }
             }
@@ -498,6 +525,7 @@
             triggerVibrate();
             state.timerSeconds = 0;
             state.timerActive = false;
+            state.timerStartedAt = null;
             sync(); render();
         };
 
@@ -552,17 +580,18 @@
             window.history.pushState({ noBackExits: true }, "");
         
             if (unsubscribeRoom) unsubscribeRoom();
-            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), (s) => { 
+            unsubscribeRoom = onSnapshot(doc(db, 'matches', currentRoom), { includeMetadataChanges: true },(s) => { 
                 if (s.exists()) { 
                     const newData = s.data();
                     if (userRole === 'admin' && newData.flag !== state.flag) {
                         saveUndo();
                     }
-                    if(newData.timerActive !== state.timerActive || Math.abs(newData.timerSeconds - state.timerSeconds) > 5) {
-                        state.timerSeconds = newData.timerSeconds;
-                        state.timerActive = newData.timerActive;
-                    }
+                    state.timerSeconds = newData.timerSeconds;
+                    state.timerActive = newData.timerActive;
+                    state.timerStartedAt = newData.timerStartedAt;
+                    
                     state = newData; 
+                    setStatus(!s.metadata.fromCache && navigator.onLine);
                     render(); 
                 } 
             });
